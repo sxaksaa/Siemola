@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LockerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffController;
@@ -16,10 +17,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->parameters(['staff' => 'staff'])
             ->except('show');
         Route::resource('lockers', LockerController::class)->except('show');
+        Route::resource('students', StudentController::class)->except('show');
     });
 
     Route::middleware('role:staff')->group(function () {
-        Route::resource('students', StudentController::class)->except('show');
+        Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+        Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

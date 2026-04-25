@@ -1,4 +1,4 @@
-<x-siemola-layout title="Data Mahasiswa" active-menu="Data Mahasiswa" user-role="Staff" sidebar-note="Data mahasiswa dipakai buat identitas peminjam. UID RFID akan dicocokkan ke mahasiswa ini saat kartu ditap di perangkat locker.">
+<x-siemola-layout title="Data Mahasiswa" active-menu="Data Mahasiswa" user-role="Admin" sidebar-note="Admin mengelola data mahasiswa sebagai identitas peminjam dan UID RFID untuk akses locker.">
     <section class="space-y-6">
         <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <form method="GET" action="{{ route('students.index') }}" class="w-full xl:max-w-4xl">
@@ -73,21 +73,5 @@
             {{ $students->links() }}
         </div>
 
-        <section class="grid gap-4 lg:grid-cols-3">
-            <article class="siemola-info-card">
-                <h2 class="siemola-info-title">Isi tabel `students`</h2>
-                <p class="siemola-info-text">Minimal ada `name`, `nim`, `rfid_uid`, `study_program`, dan `class_name`. Ini sudah cukup untuk identitas peminjam waktu RFID ditap.</p>
-            </article>
-
-            <article class="siemola-info-card">
-                <h2 class="siemola-info-title">Alur RFID</h2>
-                <p class="siemola-info-text">Perangkat kirim UID ke server, server cari UID di tabel mahasiswa, lalu cek apakah mahasiswa itu boleh membuka locker yang diminta.</p>
-            </article>
-
-            <article class="siemola-info-card">
-                <h2 class="siemola-info-title">Riwayat transaksi</h2>
-                <p class="siemola-info-text">Setiap buka locker sebaiknya dicatat ke tabel `borrowings`, jadi kamu bisa tahu siapa pinjam, kapan pinjam, kapan kembali, dan apakah telat.</p>
-            </article>
-        </section>
     </section>
 </x-siemola-layout>

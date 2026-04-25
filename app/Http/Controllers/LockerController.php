@@ -20,12 +20,11 @@ class LockerController extends Controller
                     $innerQuery
                         ->where('code', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%")
-                        ->orWhere('location', 'like', "%{$search}%")
                         ->orWhere('device_id', 'like', "%{$search}%")
                         ->orWhere('status', 'like', "%{$search}%");
                 });
             })
-            ->latest()
+            ->orderByRaw('LENGTH(code), code')
             ->paginate(10)
             ->withQueryString();
 
@@ -46,6 +45,9 @@ class LockerController extends Controller
     {
         $validated = $request->validate($this->rules());
 
+        $validated['location'] = null;
+        $validated['last_ping_at'] = null;
+
         Locker::create($validated);
 
         return redirect()
@@ -63,6 +65,9 @@ class LockerController extends Controller
     public function update(Request $request, Locker $locker): RedirectResponse
     {
         $validated = $request->validate($this->rules($locker->id));
+
+        $validated['location'] = null;
+        $validated['last_ping_at'] = null;
 
         $locker->update($validated);
 
@@ -90,15 +95,13 @@ class LockerController extends Controller
                 Rule::unique('lockers', 'code')->ignore($lockerId),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'location' => ['nullable', 'string', 'max:255'],
             'device_id' => [
                 'nullable',
                 'string',
                 'max:100',
                 Rule::unique('lockers', 'device_id')->ignore($lockerId),
             ],
-            'status' => ['required', 'in:available,borrowed,late,maintenance,offline'],
-            'last_ping_at' => ['nullable', 'date'],
+            'status' => ['required', 'in:available,borrowed,late'],
         ];
     }
 }

@@ -1,4 +1,4 @@
-<x-siemola-layout title="Data Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin mengelola identitas loker, device IoT, lokasi pemasangan, dan status operasional locker.">
+<x-siemola-layout title="Data Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin mengelola identitas loker, device ID, dan status operasional locker.">
     <section class="space-y-6">
         <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <form method="GET" action="{{ route('lockers.index') }}" class="w-full xl:max-w-4xl">
@@ -25,10 +25,8 @@
                         <tr class="border-b border-slate-200 bg-white text-slate-900">
                             <th class="siemola-th">Kode Loker</th>
                             <th class="siemola-th">Nama</th>
-                            <th class="siemola-th">Lokasi</th>
                             <th class="siemola-th">Device ID</th>
                             <th class="siemola-th">Status</th>
-                            <th class="siemola-th">Last Ping</th>
                             <th class="siemola-th text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -37,20 +35,22 @@
                             <tr class="border-b border-slate-100 last:border-b-0">
                                 <td class="siemola-td font-medium text-slate-800">{{ $locker->code }}</td>
                                 <td class="siemola-td">{{ $locker->name }}</td>
-                                <td class="siemola-td">{{ $locker->location ?: '-' }}</td>
                                 <td class="siemola-td">{{ $locker->device_id ?: '-' }}</td>
                                 <td class="siemola-td">
                                     <span class="siemola-badge {{ match($locker->status) {
                                         'available' => 'siemola-badge-active',
                                         'borrowed' => 'siemola-badge-borrowed',
                                         'late' => 'siemola-badge-late',
-                                        'maintenance' => 'siemola-badge-maintenance',
                                         default => 'siemola-badge-inactive',
                                     } }}">
-                                        {{ ucfirst($locker->status) }}
+                                        {{ match($locker->status) {
+                                            'available' => 'Tersedia',
+                                            'borrowed' => 'Sedang dipinjam',
+                                            'late' => 'Telat Mengembalikan',
+                                            default => ucfirst($locker->status),
+                                        } }}
                                     </span>
                                 </td>
-                                <td class="siemola-td">{{ $locker->last_ping_at?->format('d M Y H:i') ?? '-' }}</td>
                                 <td class="siemola-td">
                                     <div class="flex items-center justify-center gap-3">
                                         <a href="{{ route('lockers.edit', $locker) }}" class="siemola-icon-action text-blue-500" aria-label="Edit loker">
@@ -73,7 +73,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-5 py-10 text-center text-sm font-medium text-slate-400">Belum ada data loker yang cocok dengan pencarian.</td>
+                                <td colspan="5" class="px-5 py-10 text-center text-sm font-medium text-slate-400">Belum ada data loker yang cocok dengan pencarian.</td>
                             </tr>
                         @endforelse
                     </tbody>

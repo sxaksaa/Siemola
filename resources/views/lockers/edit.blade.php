@@ -1,4 +1,4 @@
-<x-siemola-layout title="Edit Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin dapat mengubah status, lokasi, dan device ID locker agar sinkron dengan kondisi perangkat nyata.">
+<x-siemola-layout title="Edit Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin dapat mengubah device ID dan status locker agar sinkron dengan kondisi perangkat nyata.">
     <section class="siemola-form-card">
         <div class="mb-6">
             <h2 class="text-2xl font-extrabold text-slate-950">Edit Data Loker</h2>

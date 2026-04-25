@@ -1,4 +1,4 @@
-<x-siemola-layout title="Data Staf" active-menu="Data Staf" user-role="Admin" sidebar-note="Admin mengelola akun staff yang bertugas memonitor dashboard dan mengatur data mahasiswa.">
+<x-siemola-layout title="Data Staf" active-menu="Data Staf" user-role="Admin" sidebar-note="Admin mengelola akun staff yang bertugas memonitor dashboard operasional.">
     <section class="space-y-6">
         <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <form method="GET" action="{{ route('staff.index') }}" class="w-full xl:max-w-4xl">

@@ -43,7 +43,11 @@
 
     <div>
         <label for="class_name" class="siemola-label">Kelas</label>
-        <input id="class_name" name="class_name" type="text" value="{{ old('class_name', $student->class_name) }}" class="siemola-input" required>
+        <select id="class_name" name="class_name" class="siemola-input" required>
+            @foreach (['T4A', 'T4B', 'T4C', 'T4D', 'T4E', 'T4F', 'T4G'] as $className)
+                <option value="{{ $className }}" @selected(old('class_name', $student->class_name) === $className)>{{ $className }}</option>
+            @endforeach
+        </select>
         @error('class_name')
             <p class="siemola-error">{{ $message }}</p>
         @enderror

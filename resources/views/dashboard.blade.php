@@ -37,24 +37,73 @@
             <article class="rounded-[30px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 sm:p-7">
                 <div>
                     <h2 class="text-2xl font-extrabold tracking-tight text-slate-950">Statistik Sistem</h2>
-                    <p class="mt-1 text-sm font-medium text-slate-400">Distribusi mahasiswa aktif berdasarkan program studi yang tersimpan di database saat ini.</p>
+                    <p class="mt-1 text-sm font-medium text-slate-400">Grafik jumlah mahasiswa berdasarkan program studi yang tersimpan di database saat ini.</p>
                 </div>
 
-                <div class="mt-8 space-y-5">
-                    @forelse ($studyProgramChart as $item)
-                        <div class="grid gap-3 md:grid-cols-[220px_minmax(0,1fr)_60px] md:items-center">
-                            <div class="text-sm font-semibold text-slate-600">{{ $item['label'] }}</div>
-                            <div class="h-4 overflow-hidden rounded-full bg-slate-100">
-                                <div
-                                    class="h-full rounded-full bg-gradient-to-r {{ $item['bar'] }}"
-                                    style="width: {{ max(($item['value'] / $maxStudyProgramValue) * 100, 8) }}%;"
-                                ></div>
+                <div class="mt-8">
+                    @if ($studyProgramChart->isNotEmpty())
+                        @php
+                            $chartItems = $studyProgramChart->values();
+                            $chartWidth = 720;
+                            $chartHeight = 300;
+                            $chartPadding = 44;
+                            $usableWidth = $chartWidth - ($chartPadding * 2);
+                            $usableHeight = $chartHeight - ($chartPadding * 2);
+                            $itemCount = $chartItems->count();
+                            $points = $chartItems->map(function ($item, $index) use ($itemCount, $chartWidth, $chartPadding, $usableWidth, $usableHeight, $maxStudyProgramValue) {
+                                $x = $itemCount > 1
+                                    ? $chartPadding + (($usableWidth / ($itemCount - 1)) * $index)
+                                    : $chartWidth / 2;
+                                $y = $chartPadding + (($maxStudyProgramValue - $item['value']) / $maxStudyProgramValue * $usableHeight);
+
+                                return [
+                                    'x' => round($x, 2),
+                                    'y' => round($y, 2),
+                                    'label' => $item['label'],
+                                    'value' => $item['value'],
+                                ];
+                            });
+                            $pointString = $points->map(fn ($point) => "{$point['x']},{$point['y']}")->implode(' ');
+                            $areaPointString = "{$chartPadding},".($chartHeight - $chartPadding).' '.$pointString.' '.($chartWidth - $chartPadding).','.($chartHeight - $chartPadding);
+                        @endphp
+
+                        <div class="overflow-hidden rounded-[24px] bg-slate-50 p-4 ring-1 ring-slate-200">
+                            <div class="overflow-x-auto">
+                                <svg viewBox="0 0 {{ $chartWidth }} {{ $chartHeight + 54 }}" role="img" aria-label="Grafik line statistik mahasiswa per program studi" class="min-w-[640px]">
+                                    <defs>
+                                        <linearGradient id="study-line-fill" x1="0" x2="0" y1="0" y2="1">
+                                            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
+                                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                                        </linearGradient>
+                                    </defs>
+
+                                    @foreach ([0, 1, 2, 3] as $lineIndex)
+                                        @php
+                                            $gridY = $chartPadding + (($usableHeight / 3) * $lineIndex);
+                                            $gridValue = round($maxStudyProgramValue - (($maxStudyProgramValue / 3) * $lineIndex));
+                                        @endphp
+                                        <line x1="{{ $chartPadding }}" y1="{{ $gridY }}" x2="{{ $chartWidth - $chartPadding }}" y2="{{ $gridY }}" stroke="#e2e8f0" stroke-width="1" />
+                                        <text x="12" y="{{ $gridY + 5 }}" fill="#94a3b8" font-size="12" font-weight="700">{{ $gridValue }}</text>
+                                    @endforeach
+
+                                    <polyline points="{{ $areaPointString }}" fill="url(#study-line-fill)" stroke="none" />
+                                    <polyline points="{{ $pointString }}" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+
+                                    @foreach ($points as $point)
+                                        <circle cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="8" fill="#ffffff" stroke="#2563eb" stroke-width="4" />
+                                        <text x="{{ $point['x'] }}" y="{{ $point['y'] - 16 }}" text-anchor="middle" fill="#0f172a" font-size="14" font-weight="800">{{ $point['value'] }}</text>
+                                        <text x="{{ $point['x'] }}" y="{{ $chartHeight + 12 }}" text-anchor="middle" fill="#475569" font-size="12" font-weight="700">
+                                            {{ \Illuminate\Support\Str::limit($point['label'], 16) }}
+                                        </text>
+                                    @endforeach
+                                </svg>
                             </div>
-                            <div class="text-right text-sm font-extrabold text-slate-900">{{ $item['value'] }}</div>
                         </div>
-                    @empty
-                        <p class="text-sm font-medium text-slate-400">Belum ada data mahasiswa untuk divisualisasikan.</p>
-                    @endforelse
+                    @else
+                        <div class="rounded-[24px] bg-slate-50 px-5 py-12 text-center ring-1 ring-slate-200">
+                            <p class="text-sm font-semibold text-slate-400">Belum ada data mahasiswa untuk divisualisasikan.</p>
+                        </div>
+                    @endif
                 </div>
             </article>
 

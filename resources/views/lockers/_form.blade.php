@@ -16,14 +16,6 @@
     </div>
 
     <div>
-        <label for="location" class="siemola-label">Lokasi</label>
-        <input id="location" name="location" type="text" value="{{ old('location', $locker->location) }}" class="siemola-input">
-        @error('location')
-            <p class="siemola-error">{{ $message }}</p>
-        @enderror
-    </div>
-
-    <div>
         <label for="device_id" class="siemola-label">Device ID</label>
         <input id="device_id" name="device_id" type="text" value="{{ old('device_id', $locker->device_id) }}" class="siemola-input">
         @error('device_id')
@@ -35,24 +27,14 @@
         <label for="status" class="siemola-label">Status</label>
         <select id="status" name="status" class="siemola-input" required>
             @foreach ([
-                'available' => 'Available',
-                'borrowed' => 'Borrowed',
-                'late' => 'Late',
-                'maintenance' => 'Maintenance',
-                'offline' => 'Offline',
+                'available' => 'Tersedia',
+                'borrowed' => 'Sedang dipinjam',
+                'late' => 'Telat Mengembalikan',
             ] as $value => $label)
                 <option value="{{ $value }}" @selected(old('status', $locker->status ?: 'available') === $value)>{{ $label }}</option>
             @endforeach
         </select>
         @error('status')
-            <p class="siemola-error">{{ $message }}</p>
-        @enderror
-    </div>
-
-    <div>
-        <label for="last_ping_at" class="siemola-label">Last Ping</label>
-        <input id="last_ping_at" name="last_ping_at" type="datetime-local" value="{{ old('last_ping_at', $locker->last_ping_at?->format('Y-m-d\\TH:i')) }}" class="siemola-input">
-        @error('last_ping_at')
             <p class="siemola-error">{{ $message }}</p>
         @enderror
     </div>

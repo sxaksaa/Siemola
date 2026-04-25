@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Locker;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\BorrowingStatusService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -12,6 +13,8 @@ class DashboardController extends Controller
 {
     public function __invoke(): View
     {
+        app(BorrowingStatusService::class)->syncLateStatuses();
+
         $iconMap = [
             'staff' => 'M5 18h14M6 18v-1a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v1M12 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 4a3 3 0 0 0-3 3v1m18-1v-1a3 3 0 0 0-3-3m-1-7a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z',
             'students' => 'M16 21v-1.2a3.8 3.8 0 0 0-3.8-3.8H8.8A3.8 3.8 0 0 0 5 19.8V21m11-11a3 3 0 1 1-6 0a3 3 0 0 1 6 0Zm4 8.2V18a3.2 3.2 0 0 0-2.5-3.1m-1.3-7.4a2.8 2.8 0 1 1 0 5.6',
@@ -34,15 +37,13 @@ class DashboardController extends Controller
         ];
 
         $lockers = Locker::query()
-            ->orderBy('code')
+            ->orderByRaw('LENGTH(code), code')
             ->get()
             ->map(function (Locker $locker) use ($iconMap) {
                 $statusMap = [
                     'available' => ['label' => 'Tersedia', 'state' => 'available', 'icon_path' => $iconMap['available']],
                     'borrowed' => ['label' => 'Sedang dipinjam', 'state' => 'borrowed', 'icon_path' => $iconMap['borrowed']],
                     'late' => ['label' => 'Telat Mengembalikan', 'state' => 'late', 'icon_path' => $iconMap['warning']],
-                    'maintenance' => ['label' => 'Maintenance', 'state' => 'late', 'icon_path' => $iconMap['warning']],
-                    'offline' => ['label' => 'Offline', 'state' => 'late', 'icon_path' => $iconMap['warning']],
                 ];
 
                 $mappedStatus = $statusMap[$locker->status] ?? $statusMap['available'];
@@ -83,10 +84,8 @@ class DashboardController extends Controller
 
         $lockerStatusSummary = collect([
             ['label' => 'Tersedia', 'value' => Locker::query()->where('status', 'available')->count(), 'tone' => 'text-emerald-600 bg-emerald-50 ring-emerald-100'],
-            ['label' => 'Dipinjam', 'value' => Locker::query()->where('status', 'borrowed')->count(), 'tone' => 'text-rose-600 bg-rose-50 ring-rose-100'],
-            ['label' => 'Terlambat', 'value' => Locker::query()->where('status', 'late')->count(), 'tone' => 'text-amber-600 bg-amber-50 ring-amber-100'],
-            ['label' => 'Maintenance', 'value' => Locker::query()->where('status', 'maintenance')->count(), 'tone' => 'text-blue-600 bg-blue-50 ring-blue-100'],
-            ['label' => 'Offline', 'value' => Locker::query()->where('status', 'offline')->count(), 'tone' => 'text-slate-600 bg-slate-100 ring-slate-200'],
+            ['label' => 'Sedang dipinjam', 'value' => Locker::query()->where('status', 'borrowed')->count(), 'tone' => 'text-rose-600 bg-rose-50 ring-rose-100'],
+            ['label' => 'Telat Mengembalikan', 'value' => Locker::query()->where('status', 'late')->count(), 'tone' => 'text-amber-600 bg-amber-50 ring-amber-100'],
         ]);
 
         return view('dashboard', [

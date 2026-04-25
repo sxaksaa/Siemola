@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('location')->nullable();
             $table->string('device_id')->nullable()->unique();
-            $table->enum('status', ['available', 'borrowed', 'late', 'maintenance', 'offline'])->default('available');
+            $table->enum('status', ['available', 'borrowed', 'late'])->default('available');
             $table->timestamp('last_ping_at')->nullable();
             $table->timestamps();
         });

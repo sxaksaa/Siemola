@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         DB::table('sessions')->truncate();
         DB::table('password_reset_tokens')->truncate();
         DB::table('users')->truncate();
+        DB::table('borrowings')->truncate();
         DB::table('students')->truncate();
         DB::table('lockers')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
@@ -52,12 +53,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $students = [
-            ['name' => 'Embun Bening Cantika Dewi', 'nim' => '243140700111004', 'rfid_uid' => '12345678910111213', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4A', 'status' => 'active'],
-            ['name' => 'Bagas Pratama', 'nim' => '243140700111005', 'rfid_uid' => '12345678910111214', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4B', 'status' => 'active'],
-            ['name' => 'Salsa Maharani', 'nim' => '243140700111006', 'rfid_uid' => '12345678910111215', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4C', 'status' => 'active'],
-            ['name' => 'Rian Saputra', 'nim' => '243140700111007', 'rfid_uid' => '12345678910111216', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4D', 'status' => 'active'],
-            ['name' => 'Nabila Ayuningtyas', 'nim' => '243140700111008', 'rfid_uid' => '12345678910111217', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4E', 'status' => 'active'],
-            ['name' => 'Galih Permana', 'nim' => '243140700111009', 'rfid_uid' => '12345678910111218', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4F', 'status' => 'active'],
+            ['name' => 'Embun Bening Cantika Dewi', 'nim' => '243140700111004', 'rfid_uid' => '37 DB 7E 5', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4A', 'status' => 'active'],
+            ['name' => 'Bagas Pratama', 'nim' => '243140700111005', 'rfid_uid' => 'BD 9 65 F8', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4B', 'status' => 'active'],
+            ['name' => 'Salsa Maharani', 'nim' => '243140700111006', 'rfid_uid' => '41 9 65 F8', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4C', 'status' => 'active'],
+            ['name' => 'Rian Saputra', 'nim' => '243140700111007', 'rfid_uid' => 'C5 B7 68 F8', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4D', 'status' => 'active'],
+            ['name' => 'Nabila Ayuningtyas', 'nim' => '243140700111008', 'rfid_uid' => '84 F7 65 F8', 'study_program' => 'Teknologi Informasi', 'class_name' => 'T4E', 'status' => 'active'],
         ];
 
         foreach ($students as $student) {
@@ -68,18 +68,18 @@ class DatabaseSeeder extends Seeder
         }
 
         $lockers = [
-            ['code' => 'L1', 'name' => 'Locker 1', 'location' => 'Lab TI A', 'device_id' => 'ESP32-L1', 'status' => 'borrowed', 'last_ping_at' => now()],
-            ['code' => 'L2', 'name' => 'Locker 2', 'location' => 'Lab TI A', 'device_id' => 'ESP32-L2', 'status' => 'available', 'last_ping_at' => now()],
-            ['code' => 'L3', 'name' => 'Locker 3', 'location' => 'Lab TI A', 'device_id' => 'ESP32-L3', 'status' => 'available', 'last_ping_at' => now()],
-            ['code' => 'L4', 'name' => 'Locker 4', 'location' => 'Lab TI B', 'device_id' => 'ESP32-L4', 'status' => 'borrowed', 'last_ping_at' => now()],
-            ['code' => 'L5', 'name' => 'Locker 5', 'location' => 'Lab TI B', 'device_id' => 'ESP32-L5', 'status' => 'available', 'last_ping_at' => now()],
-            ['code' => 'L6', 'name' => 'Locker 6', 'location' => 'Lab TI B', 'device_id' => 'ESP32-L6', 'status' => 'late', 'last_ping_at' => now()],
-            ['code' => 'L7', 'name' => 'Locker 7', 'location' => 'Workshop Elektro', 'device_id' => 'ESP32-L7', 'status' => 'available', 'last_ping_at' => now()],
-            ['code' => 'L8', 'name' => 'Locker 8', 'location' => 'Workshop Elektro', 'device_id' => 'ESP32-L8', 'status' => 'maintenance', 'last_ping_at' => now()],
-            ['code' => 'L9', 'name' => 'Locker 9', 'location' => 'Perpustakaan', 'device_id' => 'ESP32-L9', 'status' => 'offline', 'last_ping_at' => now()],
-            ['code' => 'L10', 'name' => 'Locker 10', 'location' => 'Perpustakaan', 'device_id' => 'ESP32-L10', 'status' => 'available', 'last_ping_at' => now()],
-            ['code' => 'L11', 'name' => 'Locker 11', 'location' => 'Ruang Multimedia', 'device_id' => 'ESP32-L11', 'status' => 'available', 'last_ping_at' => now()],
-            ['code' => 'L12', 'name' => 'Locker 12', 'location' => 'Ruang Multimedia', 'device_id' => 'ESP32-L12', 'status' => 'borrowed', 'last_ping_at' => now()],
+            ['code' => 'L1', 'name' => 'Loker 1', 'location' => null, 'device_id' => '14:08:08:A6:69:34', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L2', 'name' => 'Loker 2 Dummy', 'location' => null, 'device_id' => 'DUMMY-L2', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L3', 'name' => 'Loker 3 Dummy', 'location' => null, 'device_id' => 'DUMMY-L3', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L4', 'name' => 'Loker 4 Dummy', 'location' => null, 'device_id' => 'DUMMY-L4', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L5', 'name' => 'Loker 5 Dummy', 'location' => null, 'device_id' => 'DUMMY-L5', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L6', 'name' => 'Loker 6 Dummy', 'location' => null, 'device_id' => 'DUMMY-L6', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L7', 'name' => 'Loker 7 Dummy', 'location' => null, 'device_id' => 'DUMMY-L7', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L8', 'name' => 'Loker 8 Dummy', 'location' => null, 'device_id' => 'DUMMY-L8', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L9', 'name' => 'Loker 9 Dummy', 'location' => null, 'device_id' => 'DUMMY-L9', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L10', 'name' => 'Loker 10 Dummy', 'location' => null, 'device_id' => 'DUMMY-L10', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L11', 'name' => 'Loker 11 Dummy', 'location' => null, 'device_id' => 'DUMMY-L11', 'status' => 'available', 'last_ping_at' => null],
+            ['code' => 'L12', 'name' => 'Loker 12 Dummy', 'location' => null, 'device_id' => 'DUMMY-L12', 'status' => 'available', 'last_ping_at' => null],
         ];
 
         foreach ($lockers as $locker) {
