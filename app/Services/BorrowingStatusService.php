@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Borrowing;
-use App\Models\Locker;
 
 class BorrowingStatusService
 {
@@ -18,10 +17,6 @@ class BorrowingStatusService
 
         foreach ($lateBorrowings as $borrowing) {
             $borrowing->update(['status' => 'late']);
-
-            Locker::query()
-                ->whereKey($borrowing->locker_id)
-                ->update(['status' => 'late']);
         }
 
         $this->syncResolvedLockers();
@@ -36,26 +31,6 @@ class BorrowingStatusService
             ->where('status', '!=', 'returned')
             ->update(['status' => 'returned']);
 
-        $activeBorrowedLockerIds = Borrowing::query()
-            ->whereNull('returned_at')
-            ->where('status', 'borrowed')
-            ->pluck('locker_id')
-            ->unique();
-
-        if ($activeBorrowedLockerIds->isNotEmpty()) {
-            Locker::query()
-                ->whereKey($activeBorrowedLockerIds)
-                ->where('status', 'available')
-                ->update(['status' => 'borrowed']);
-        }
-
-        Locker::query()
-            ->whereIn('status', ['borrowed', 'late'])
-            ->whereDoesntHave('borrowings', function ($query) {
-                $query->whereNull('returned_at')
-                    ->whereIn('status', ['borrowed', 'late']);
-            })
-            ->update(['status' => 'available']);
     }
 
     public function activeLateQuery()

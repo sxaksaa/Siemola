@@ -116,7 +116,7 @@ class EspLockerController extends Controller
             $update['last_ping_at'] = now();
             $update['switch_state'] = $switchState;
             $update['switch_reported_at'] = now();
-            $update['status'] = $this->operationalStatusFromSwitchState($locker, $switchState);
+            $update['status'] = $this->statusFromSwitchState($switchState);
         }
 
         if ($update !== []) {
@@ -218,7 +218,6 @@ class EspLockerController extends Controller
         ]);
 
         $locker->update([
-            'status' => 'borrowed',
             'last_ping_at' => now(),
         ]);
 
@@ -260,7 +259,6 @@ class EspLockerController extends Controller
         ]);
 
         $locker->update([
-            'status' => 'available',
             'last_ping_at' => now(),
         ]);
 
@@ -327,21 +325,6 @@ class EspLockerController extends Controller
     private function statusFromSwitchState(int $switchState): string
     {
         return $switchState === 1 ? 'available' : 'borrowed';
-    }
-
-    private function operationalStatusFromSwitchState(Locker $locker, int $switchState): string
-    {
-        $activeBorrowing = Borrowing::query()
-            ->where('locker_id', $locker->id)
-            ->whereNull('returned_at')
-            ->latest('borrowed_at')
-            ->first();
-
-        if ($activeBorrowing) {
-            return $activeBorrowing->status === 'late' ? 'late' : 'borrowed';
-        }
-
-        return $this->statusFromSwitchState($switchState);
     }
 
     private function switchStateLabel(?int $switchState): string
