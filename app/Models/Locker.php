@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Locker extends Model
 {
@@ -38,5 +39,10 @@ class Locker extends Model
     public function lockerAccesses(): HasMany
     {
         return $this->hasMany(LockerAccess::class);
+    }
+
+    public function latestLockerAccess(): HasOne
+    {
+        return $this->hasOne(LockerAccess::class)->latestOfMany('accessed_at');
     }
 }

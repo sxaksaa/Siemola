@@ -44,6 +44,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function (Locker $locker) use ($iconMap) {
                 $isDummy = str_starts_with((string) $locker->device_id, 'DUMMY-');
+                $isRealEsp = ! $isDummy && filled($locker->device_id);
                 $statusMap = [
                     'available' => ['label' => 'Tersedia', 'state' => 'available', 'icon_path' => $iconMap['available']],
                     'borrowed' => ['label' => 'Sedang dipinjam', 'state' => 'borrowed', 'icon_path' => $iconMap['borrowed']],
@@ -58,6 +59,7 @@ class DashboardController extends Controller
                     'state' => $mappedStatus['state'],
                     'icon_path' => $mappedStatus['icon_path'],
                     'is_dummy' => $isDummy,
+                    'is_real_esp' => $isRealEsp,
                 ];
             })
             ->all();

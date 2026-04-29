@@ -24,11 +24,13 @@
                     <thead>
                         <tr class="siemola-table-head">
                             <th class="siemola-th">Kode Loker</th>
-                            <th class="siemola-th">Nama</th>
+                            <th class="siemola-th">Mode</th>
                             <th class="siemola-th">Device ID</th>
                             <th class="siemola-th">Sensor Switch</th>
                             <th class="siemola-th">Status</th>
                             <th class="siemola-th">Peminjam Aktif</th>
+                            <th class="siemola-th">Sinyal ESP</th>
+                            <th class="siemola-th">Tap Terakhir</th>
                             <th class="siemola-th">Catatan</th>
                             <th class="siemola-th text-center">Aksi</th>
                         </tr>
@@ -36,17 +38,42 @@
                     <tbody>
                         @forelse ($lockers as $locker)
                             @php
+                                $isDummy = str_starts_with((string) $locker->device_id, 'DUMMY-');
+                                $isRealEsp = ! $isDummy && filled($locker->device_id);
                                 $activeBorrowing = $locker->borrowings->first();
+                                $lastAccess = $locker->latestLockerAccess;
+                                $syncAt = $locker->switch_reported_at ?? $locker->last_ping_at;
                                 $needsAttention = match ($locker->switch_state) {
                                     0 => $activeBorrowing !== null,
                                     1 => $activeBorrowing === null,
                                     default => true,
                                 };
+                                $syncIsStale = $isRealEsp && (! $syncAt || $syncAt->lessThan(now()->subMinutes(5)));
+                                $noteLabel = match (true) {
+                                    $isDummy => 'Dummy',
+                                    $syncIsStale => 'Perlu cek ESP',
+                                    $needsAttention => 'Perlu cek data',
+                                    default => 'Sinkron',
+                                };
+                                $noteClass = match (true) {
+                                    $isDummy => 'siemola-badge-inactive',
+                                    $syncIsStale || $needsAttention => 'siemola-badge-late',
+                                    default => 'siemola-badge-active',
+                                };
                             @endphp
                             <tr class="siemola-table-row">
-                                <td class="siemola-td font-medium text-slate-800">{{ $locker->code }}</td>
-                                <td class="siemola-td">{{ $locker->name }}</td>
-                                <td class="siemola-td">{{ $locker->device_id ?: '-' }}</td>
+                                <td class="siemola-td">
+                                    <div class="font-extrabold text-slate-900">{{ $locker->code }}</div>
+                                    <div class="mt-1 text-xs font-semibold text-slate-400">{{ $locker->name }}</div>
+                                </td>
+                                <td class="siemola-td">
+                                    <span class="siemola-badge {{ $isRealEsp ? 'siemola-badge-blue' : 'siemola-badge-inactive' }}">
+                                        {{ $isRealEsp ? 'ESP Aktif' : 'Dummy' }}
+                                    </span>
+                                </td>
+                                <td class="siemola-td">
+                                    <code class="siemola-device-code">{{ $locker->device_id ?: '-' }}</code>
+                                </td>
                                 <td class="siemola-td">
                                     <span class="siemola-badge {{ match($locker->switch_state) {
                                         0 => 'siemola-badge-active',
@@ -58,19 +85,6 @@
                                             1 => 'Kosong',
                                             default => 'Belum sinkron',
                                         } }}
-                                    </span>
-                                </td>
-                                <td class="siemola-td">
-                                    @if ($activeBorrowing)
-                                        <div class="font-bold text-slate-800">{{ $activeBorrowing->student?->name ?? 'Mahasiswa' }}</div>
-                                        <div class="mt-1 text-xs font-semibold text-slate-400">{{ $activeBorrowing->borrowed_rfid_uid }}</div>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td class="siemola-td">
-                                    <span class="siemola-badge {{ $needsAttention ? 'siemola-badge-late' : 'siemola-badge-active' }}">
-                                        {{ $needsAttention ? 'Perlu dicek' : 'Sinkron' }}
                                     </span>
                                 </td>
                                 <td class="siemola-td">
@@ -86,6 +100,37 @@
                                             'late' => 'Telat Mengembalikan',
                                             default => ucfirst($locker->status),
                                         } }}
+                                    </span>
+                                </td>
+                                <td class="siemola-td">
+                                    @if ($activeBorrowing)
+                                        <div class="font-bold text-slate-800">{{ $activeBorrowing->student?->name ?? 'Mahasiswa' }}</div>
+                                        <div class="mt-1 text-xs font-semibold text-slate-400">{{ $activeBorrowing->borrowed_rfid_uid }}</div>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td class="siemola-td">
+                                    @if ($isDummy)
+                                        <span class="siemola-muted-cell">Tidak dipantau</span>
+                                    @elseif ($syncAt)
+                                        <div class="font-bold text-slate-800">{{ $syncAt->copy()->timezone($displayTimezone)->format('d/m/Y H:i:s') }}</div>
+                                        <div class="mt-1 text-xs font-semibold text-slate-400">{{ $syncAt->diffForHumans() }}</div>
+                                    @else
+                                        <span class="siemola-badge siemola-badge-late">Belum sinkron</span>
+                                    @endif
+                                </td>
+                                <td class="siemola-td">
+                                    @if ($lastAccess)
+                                        <div class="font-bold text-slate-800">{{ $lastAccess->student?->name ?? 'Mahasiswa' }}</div>
+                                        <div class="mt-1 text-xs font-semibold text-slate-400">{{ $lastAccess->accessed_at?->copy()->timezone($displayTimezone)->format('d/m/Y H:i') }}</div>
+                                    @else
+                                        <span class="siemola-muted-cell">Belum ada tap</span>
+                                    @endif
+                                </td>
+                                <td class="siemola-td">
+                                    <span class="siemola-badge {{ $noteClass }}">
+                                        {{ $noteLabel }}
                                     </span>
                                 </td>
                                 <td class="siemola-td">
@@ -110,7 +155,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="siemola-table-empty">Belum ada data loker yang cocok dengan pencarian.</td>
+                                <td colspan="10" class="siemola-table-empty">Belum ada data loker yang cocok dengan pencarian.</td>
                             </tr>
                         @endforelse
                     </tbody>

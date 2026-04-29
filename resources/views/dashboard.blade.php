@@ -205,8 +205,10 @@
 
         <div class="siemola-locker-grid">
             @foreach ($lockers as $locker)
-                <article class="siemola-locker-card {{ $lockerClasses[$locker['state']] ?? 'siemola-locker-available' }}">
-                    @if ($locker['is_dummy'])
+                <article class="siemola-locker-card {{ $lockerClasses[$locker['state']] ?? 'siemola-locker-available' }} {{ $locker['is_real_esp'] ? 'siemola-locker-real' : '' }} {{ $locker['is_dummy'] ? 'siemola-locker-dummy' : '' }}">
+                    @if ($locker['is_real_esp'])
+                        <span class="siemola-locker-esp-badge">ESP Aktif</span>
+                    @elseif ($locker['is_dummy'])
                         <span class="siemola-locker-dummy-badge">Dummy</span>
                     @endif
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-7 w-7">

@@ -15,11 +15,14 @@ class LockerController extends Controller
         $search = $request->string('search')->toString();
 
         $lockers = Locker::query()
-            ->with(['borrowings' => function ($query) {
-                $query->with('student')
-                    ->whereNull('returned_at')
-                    ->latest('borrowed_at');
-            }])
+            ->with([
+                'latestLockerAccess.student',
+                'borrowings' => function ($query) {
+                    $query->with('student')
+                        ->whereNull('returned_at')
+                        ->latest('borrowed_at');
+                },
+            ])
             ->when($search, function ($query, $search) {
                 $query->where(function ($innerQuery) use ($search) {
                     $innerQuery
@@ -44,6 +47,7 @@ class LockerController extends Controller
         return view('lockers.index', [
             'lockers' => $lockers,
             'search' => $search,
+            'displayTimezone' => config('app.display_timezone', 'Asia/Jakarta'),
         ]);
     }
 
