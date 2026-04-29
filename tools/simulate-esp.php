@@ -11,6 +11,7 @@ $command = $options['_command'] ?? 'help';
 $baseUrl = rtrim((string) ($options['base'] ?? envValue($rootPath, 'ESP_SIM_BASE_URL') ?? 'http://127.0.0.1:8000'), '/');
 $deviceId = (string) ($options['device'] ?? envValue($rootPath, 'ESP_SIM_DEVICE_ID') ?? '14:08:08:A6:69:34');
 $uid = (string) ($options['uid'] ?? envValue($rootPath, 'ESP_SIM_UID') ?? '37 DB 7E 5');
+$espToken = (string) ($options['token'] ?? envValue($rootPath, 'ESP_SIM_TOKEN') ?? envValue($rootPath, 'ESP_API_TOKEN') ?? '');
 
 if (in_array($command, ['help', '--help', '-h'], true)) {
     showUsage();
@@ -19,12 +20,12 @@ if (in_array($command, ['help', '--help', '-h'], true)) {
 
 try {
     match ($command) {
-        'check' => readLockerStatus($baseUrl, $deviceId),
-        'status' => sendSensorStatus($baseUrl, $deviceId, switchState($options['locstatus'] ?? $options['state'] ?? 0)),
-        'tap' => sendTap($baseUrl, $deviceId, $uid),
-        'borrow' => simulateBorrow($baseUrl, $deviceId, $uid),
-        'return' => simulateReturn($baseUrl, $deviceId, $uid),
-        'cycle' => simulateCycle($baseUrl, $deviceId, $uid),
+        'check' => readLockerStatus($baseUrl, $deviceId, $espToken),
+        'status' => sendSensorStatus($baseUrl, $deviceId, switchState($options['locstatus'] ?? $options['state'] ?? 0), $espToken),
+        'tap' => sendTap($baseUrl, $deviceId, $uid, true, $espToken),
+        'borrow' => simulateBorrow($baseUrl, $deviceId, $uid, $espToken),
+        'return' => simulateReturn($baseUrl, $deviceId, $uid, $espToken),
+        'cycle' => simulateCycle($baseUrl, $deviceId, $uid, $espToken),
         default => throw new RuntimeException("Command '{$command}' tidak dikenal. Jalankan: php tools/simulate-esp.php help"),
     };
 } catch (Throwable $exception) {
@@ -32,91 +33,97 @@ try {
     exit(1);
 }
 
-function simulateBorrow(string $baseUrl, string $deviceId, string $uid): bool
+function simulateBorrow(string $baseUrl, string $deviceId, string $uid, string $espToken): bool
 {
     writeln('Simulasi pinjam: switch ketekan, RFID tap, lalu barang diambil.');
 
-    $current = readLockerStatus($baseUrl, $deviceId);
+    $current = readLockerStatus($baseUrl, $deviceId, $espToken);
 
     if ((bool) ($current['has_active_borrowing'] ?? false)) {
         writeln(PHP_EOL.'Loker belum tersedia, jadi simulator tidak mengubah nilai switch.');
         writeln('Masih ada peminjaman aktif oleh '.($current['active_borrower'] ?? 'mahasiswa lain').'.');
         writeln('Simulator hanya mengirim tap RFID seperti orang mencoba akses loker yang masih dipinjam.');
-        sendTap($baseUrl, $deviceId, $uid, false);
+        sendTap($baseUrl, $deviceId, $uid, false, $espToken);
 
         return true;
     }
 
     if ((int) ($current['switch_state'] ?? $current['locstatus'] ?? -1) !== 0) {
-        sendSensorStatus($baseUrl, $deviceId, 0);
+        sendSensorStatus($baseUrl, $deviceId, 0, $espToken);
     }
 
-    sendTap($baseUrl, $deviceId, $uid);
-    sendSensorStatus($baseUrl, $deviceId, 1);
+    sendTap($baseUrl, $deviceId, $uid, true, $espToken);
+    sendSensorStatus($baseUrl, $deviceId, 1, $espToken);
 
     return true;
 }
 
-function simulateCycle(string $baseUrl, string $deviceId, string $uid): bool
+function simulateCycle(string $baseUrl, string $deviceId, string $uid, string $espToken): bool
 {
-    simulateBorrow($baseUrl, $deviceId, $uid);
-    simulateReturn($baseUrl, $deviceId, $uid);
+    simulateBorrow($baseUrl, $deviceId, $uid, $espToken);
+    simulateReturn($baseUrl, $deviceId, $uid, $espToken);
 
     return true;
 }
 
-function simulateReturn(string $baseUrl, string $deviceId, string $uid): bool
+function simulateReturn(string $baseUrl, string $deviceId, string $uid, string $espToken): bool
 {
     writeln('Simulasi kembali: locker kosong, RFID tap, lalu barang masuk lagi.');
-    $current = readLockerStatus($baseUrl, $deviceId);
+    $current = readLockerStatus($baseUrl, $deviceId, $espToken);
 
     if (! (bool) ($current['has_active_borrowing'] ?? false)) {
         writeln(PHP_EOL.'Belum ada peminjaman aktif, jadi simulator hanya mengirim tap return yang akan ditolak.');
-        sendSensorStatus($baseUrl, $deviceId, 1);
-        sendTap($baseUrl, $deviceId, $uid, false);
+        sendSensorStatus($baseUrl, $deviceId, 1, $espToken);
+        sendTap($baseUrl, $deviceId, $uid, false, $espToken);
 
         return true;
     }
 
-    sendSensorStatus($baseUrl, $deviceId, 1);
-    sendTap($baseUrl, $deviceId, $uid);
-    sendSensorStatus($baseUrl, $deviceId, 0);
+    sendSensorStatus($baseUrl, $deviceId, 1, $espToken);
+    sendTap($baseUrl, $deviceId, $uid, true, $espToken);
+    sendSensorStatus($baseUrl, $deviceId, 0, $espToken);
 
     return true;
 }
 
-function sendSensorStatus(string $baseUrl, string $deviceId, int $locstatus): void
+function sendSensorStatus(string $baseUrl, string $deviceId, int $locstatus, string $espToken): void
 {
     postJson($baseUrl.'/api/getStatus', [
         'device_id' => $deviceId,
         'locstatus' => $locstatus,
-    ]);
+    ], true, $espToken);
 }
 
-function readLockerStatus(string $baseUrl, string $deviceId): array
+function readLockerStatus(string $baseUrl, string $deviceId, string $espToken): array
 {
     return postJson($baseUrl.'/api/getStatus', [
         'device_id' => $deviceId,
-    ]);
+    ], true, $espToken);
 }
 
-function sendTap(string $baseUrl, string $deviceId, string $uid, bool $failOnError = true): void
+function sendTap(string $baseUrl, string $deviceId, string $uid, bool $failOnError = true, string $espToken = ''): void
 {
     postJson($baseUrl.'/api/tab', [
         'uid' => $uid,
         'device_id' => $deviceId,
-    ], $failOnError);
+    ], $failOnError, $espToken);
 }
 
-function postJson(string $url, array $payload, bool $failOnError = true): array
+function postJson(string $url, array $payload, bool $failOnError = true, string $espToken = ''): array
 {
     writeln(PHP_EOL.'POST '.$url);
     writeln('Payload: '.json_encode($payload, JSON_UNESCAPED_SLASHES));
 
+    $headers = "Content-Type: application/json\r\nAccept: application/json\r\n";
+
+    if ($espToken !== '') {
+        $headers .= "X-ESP-TOKEN: {$espToken}\r\n";
+    }
+
     $context = stream_context_create([
         'http' => [
             'method' => 'POST',
-            'header' => "Content-Type: application/json\r\nAccept: application/json\r\n",
+            'header' => $headers,
             'content' => json_encode($payload),
             'ignore_errors' => true,
             'timeout' => 15,
@@ -241,6 +248,7 @@ Opsi:
   --base=http://127.0.0.1:8000
   --device=14:08:08:A6:69:34
   --uid="37 DB 7E 5"
+  --token=token_rahasia
 
 Catatan:
   Default base URL simulator adalah http://127.0.0.1:8000 untuk php artisan serve.

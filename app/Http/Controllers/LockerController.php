@@ -15,6 +15,11 @@ class LockerController extends Controller
         $search = $request->string('search')->toString();
 
         $lockers = Locker::query()
+            ->with(['borrowings' => function ($query) {
+                $query->with('student')
+                    ->whereNull('returned_at')
+                    ->latest('borrowed_at');
+            }])
             ->when($search, function ($query, $search) {
                 $query->where(function ($innerQuery) use ($search) {
                     $innerQuery
@@ -22,7 +27,14 @@ class LockerController extends Controller
                         ->orWhere('name', 'like', "%{$search}%")
                         ->orWhere('device_id', 'like', "%{$search}%")
                         ->orWhere('status', 'like', "%{$search}%")
-                        ->orWhere('switch_state', 'like', "%{$search}%");
+                        ->orWhere('switch_state', 'like', "%{$search}%")
+                        ->orWhereHas('borrowings', function ($borrowingQuery) use ($search) {
+                            $borrowingQuery
+                                ->whereNull('returned_at')
+                                ->whereHas('student', function ($studentQuery) use ($search) {
+                                    $studentQuery->where('name', 'like', "%{$search}%");
+                                });
+                        });
                 });
             })
             ->orderByRaw('LENGTH(code), code')

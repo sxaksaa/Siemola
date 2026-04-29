@@ -18,6 +18,10 @@ class EspLockerController extends Controller
 {
     public function tap(Request $request): JsonResponse
     {
+        if ($response = $this->rejectInvalidToken($request)) {
+            return $response;
+        }
+
         $validator = Validator::make($request->all(), [
             'uid' => ['required', 'string', 'max:100'],
             'device_id' => ['required', 'string', 'max:100'],
@@ -80,6 +84,10 @@ class EspLockerController extends Controller
 
     public function status(Request $request): JsonResponse
     {
+        if ($response = $this->rejectInvalidToken($request)) {
+            return $response;
+        }
+
         $validator = Validator::make($request->all(), [
             'device_id' => ['required', 'string', 'max:100'],
             'locstatus' => ['nullable', 'integer', 'in:0,1'],
@@ -138,8 +146,12 @@ class EspLockerController extends Controller
         ]);
     }
 
-    public function history(): JsonResponse
+    public function history(Request $request): JsonResponse
     {
+        if ($response = $this->rejectInvalidToken($request)) {
+            return $response;
+        }
+
         $accesses = LockerAccess::query()
             ->with(['student', 'rfidCard', 'locker'])
             ->latest('accessed_at')
@@ -156,6 +168,35 @@ class EspLockerController extends Controller
                 'rfid_card_uid' => $access->rfidCard?->uid,
             ];
         }));
+    }
+
+    private function rejectInvalidToken(Request $request): ?JsonResponse
+    {
+        $configuredToken = trim((string) config('services.esp.token', ''));
+
+        if ($configuredToken === '') {
+            return null;
+        }
+
+        $givenToken = (string) $request->header('X-ESP-TOKEN', '');
+
+        if ($givenToken === '') {
+            $authorization = (string) $request->header('Authorization', '');
+
+            if (str_starts_with($authorization, 'Bearer ')) {
+                $givenToken = substr($authorization, 7);
+            }
+        }
+
+        if (hash_equals($configuredToken, trim($givenToken))) {
+            return null;
+        }
+
+        return response()->json([
+            'status' => 'denied',
+            'nama' => '',
+            'message' => 'Token ESP tidak valid.',
+        ], 401);
     }
 
     private function findActiveRfidCardByUid(string $uid): ?RfidCard

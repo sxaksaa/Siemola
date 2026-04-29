@@ -180,7 +180,9 @@
             <script>
                 (() => {
                     const interval = Number(@json($autoRefreshInterval));
+                    const snapshotUrl = @json(route('live.snapshot'));
                     const refreshTargetSelector = '[data-siemola-refresh-target="main"]';
+                    let lastSnapshotHash = null;
                     let inFlight = false;
                     let filterTimer = null;
 
@@ -206,6 +208,26 @@
                         inFlight = true;
 
                         try {
+                            const snapshot = await fetch(`${snapshotUrl}?path=${encodeURIComponent(window.location.pathname)}&query=${encodeURIComponent(window.location.search)}`, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                                credentials: 'same-origin',
+                            });
+
+                            if (snapshot.ok) {
+                                const snapshotData = await snapshot.json();
+
+                                if (lastSnapshotHash === null) {
+                                    lastSnapshotHash = snapshotData.hash;
+                                } else if (snapshotData.hash === lastSnapshotHash) {
+                                    return;
+                                } else {
+                                    lastSnapshotHash = snapshotData.hash;
+                                }
+                            }
+
                             const response = await fetch(window.location.href, {
                                 headers: {
                                     'X-Requested-With': 'XMLHttpRequest',

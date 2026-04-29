@@ -28,11 +28,21 @@
                             <th class="siemola-th">Device ID</th>
                             <th class="siemola-th">Sensor Switch</th>
                             <th class="siemola-th">Status</th>
+                            <th class="siemola-th">Peminjam Aktif</th>
+                            <th class="siemola-th">Catatan</th>
                             <th class="siemola-th text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($lockers as $locker)
+                            @php
+                                $activeBorrowing = $locker->borrowings->first();
+                                $needsAttention = match ($locker->switch_state) {
+                                    0 => $activeBorrowing !== null,
+                                    1 => $activeBorrowing === null,
+                                    default => true,
+                                };
+                            @endphp
                             <tr class="siemola-table-row">
                                 <td class="siemola-td font-medium text-slate-800">{{ $locker->code }}</td>
                                 <td class="siemola-td">{{ $locker->name }}</td>
@@ -48,6 +58,19 @@
                                             1 => 'Kosong',
                                             default => 'Belum sinkron',
                                         } }}
+                                    </span>
+                                </td>
+                                <td class="siemola-td">
+                                    @if ($activeBorrowing)
+                                        <div class="font-bold text-slate-800">{{ $activeBorrowing->student?->name ?? 'Mahasiswa' }}</div>
+                                        <div class="mt-1 text-xs font-semibold text-slate-400">{{ $activeBorrowing->borrowed_rfid_uid }}</div>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td class="siemola-td">
+                                    <span class="siemola-badge {{ $needsAttention ? 'siemola-badge-late' : 'siemola-badge-active' }}">
+                                        {{ $needsAttention ? 'Perlu dicek' : 'Sinkron' }}
                                     </span>
                                 </td>
                                 <td class="siemola-td">
@@ -87,7 +110,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="siemola-table-empty">Belum ada data loker yang cocok dengan pencarian.</td>
+                                <td colspan="8" class="siemola-table-empty">Belum ada data loker yang cocok dengan pencarian.</td>
                             </tr>
                         @endforelse
                     </tbody>
