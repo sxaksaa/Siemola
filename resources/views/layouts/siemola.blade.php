@@ -256,6 +256,66 @@
 
                     const normalizeHtml = (element) => element?.innerHTML.trim() ?? '';
 
+                    const syncStateLabels = {
+                        online: 'Online',
+                        recent: 'Baru sinkron',
+                        stale: 'Perlu dicek',
+                        waiting: 'Menunggu ESP',
+                    };
+
+                    const relativeLabel = (date) => {
+                        const elapsedSeconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+
+                        if (elapsedSeconds < 60) {
+                            return `${elapsedSeconds} detik lalu`;
+                        }
+
+                        const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+
+                        if (elapsedMinutes < 60) {
+                            return `${elapsedMinutes} menit lalu`;
+                        }
+
+                        const elapsedHours = Math.floor(elapsedMinutes / 60);
+
+                        if (elapsedHours < 24) {
+                            return `${elapsedHours} jam lalu`;
+                        }
+
+                        return `${Math.floor(elapsedHours / 24)} hari lalu`;
+                    };
+
+                    const syncStateFor = (date) => {
+                        const elapsedSeconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+
+                        if (elapsedSeconds < 60) return 'online';
+                        if (elapsedSeconds < 300) return 'recent';
+
+                        return 'stale';
+                    };
+
+                    const updateRelativeTimes = () => {
+                        document.querySelectorAll('[data-siemola-relative-time]').forEach((element) => {
+                            const syncedAt = new Date(element.dataset.siemolaRelativeTime);
+
+                            if (Number.isNaN(syncedAt.getTime())) return;
+
+                            element.textContent = relativeLabel(syncedAt);
+
+                            const syncCard = element.closest('[data-siemola-sync-card]');
+                            if (!syncCard) return;
+
+                            const state = syncStateFor(syncedAt);
+                            syncCard.classList.remove('siemola-sync-online', 'siemola-sync-recent', 'siemola-sync-stale', 'siemola-sync-waiting');
+                            syncCard.classList.add(`siemola-sync-${state}`);
+
+                            const status = syncCard.querySelector('[data-siemola-sync-status]');
+                            if (status) {
+                                status.textContent = syncStateLabels[state];
+                            }
+                        });
+                    };
+
                     const swapWhenChanged = (currentElement, nextElement) => {
                         if (!currentElement || !nextElement) return;
 
@@ -266,6 +326,7 @@
                         const scrollTop = window.scrollY;
                         currentElement.replaceChildren(...Array.from(nextElement.childNodes).map((node) => node.cloneNode(true)));
                         window.Alpine?.initTree(currentElement);
+                        updateRelativeTimes();
                         window.scrollTo({ top: scrollTop });
                     };
 
@@ -309,6 +370,8 @@
                         exportLink.href = `${exportLink.dataset.baseUrl}?${params.toString()}`;
                     });
 
+                    updateRelativeTimes();
+                    window.setInterval(updateRelativeTimes, 1000);
                     window.setInterval(refreshPage, Math.max(interval, 3000));
                 })();
             </script>

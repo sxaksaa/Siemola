@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Borrowing;
 use App\Models\Locker;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\BorrowingStatusService;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -41,6 +43,7 @@ class DashboardController extends Controller
             ->orderByRaw('LENGTH(code), code')
             ->get()
             ->map(function (Locker $locker) use ($iconMap) {
+                $isDummy = str_starts_with((string) $locker->device_id, 'DUMMY-');
                 $statusMap = [
                     'available' => ['label' => 'Tersedia', 'state' => 'available', 'icon_path' => $iconMap['available']],
                     'borrowed' => ['label' => 'Sedang dipinjam', 'state' => 'borrowed', 'icon_path' => $iconMap['borrowed']],
@@ -54,34 +57,60 @@ class DashboardController extends Controller
                     'status' => $mappedStatus['label'],
                     'state' => $mappedStatus['state'],
                     'icon_path' => $mappedStatus['icon_path'],
+                    'is_dummy' => $isDummy,
                 ];
             })
             ->all();
 
-        $studyProgramChart = Student::query()
-            ->selectRaw('study_program, COUNT(*) as total')
-            ->groupBy('study_program')
-            ->orderByDesc('total')
-            ->limit(6)
-            ->get()
-            ->map(function ($item, $index) {
-                $colors = [
-                    'from-blue-500 to-cyan-400',
-                    'from-emerald-500 to-green-400',
-                    'from-violet-500 to-fuchsia-400',
-                    'from-amber-500 to-orange-400',
-                    'from-rose-500 to-pink-400',
-                    'from-slate-500 to-slate-400',
-                ];
+        $displayTimezone = config('app.display_timezone', 'Asia/Jakarta');
+        $activityStart = now($displayTimezone)->subDays(6)->startOfDay();
+        $activityEnd = now($displayTimezone)->endOfDay();
 
-                return [
-                    'label' => $item->study_program,
-                    'value' => (int) $item->total,
-                    'bar' => $colors[$index] ?? 'from-blue-500 to-cyan-400',
-                ];
+        $activityBuckets = collect(CarbonPeriod::create($activityStart, '1 day', $activityEnd))
+            ->mapWithKeys(fn ($date) => [
+                $date->toDateString() => [
+                    'date' => $date->toDateString(),
+                    'label' => $date->format('d M'),
+                    'borrowed' => 0,
+                    'returned' => 0,
+                ],
+            ]);
+
+        Borrowing::query()
+            ->select(['borrowed_at', 'returned_at'])
+            ->where(function ($query) use ($activityStart, $activityEnd) {
+                $query
+                    ->whereBetween('borrowed_at', [$activityStart->copy()->utc(), $activityEnd->copy()->utc()])
+                    ->orWhereBetween('returned_at', [$activityStart->copy()->utc(), $activityEnd->copy()->utc()]);
+            })
+            ->get()
+            ->each(function (Borrowing $borrowing) use ($activityBuckets, $displayTimezone) {
+                if ($borrowing->borrowed_at) {
+                    $borrowedDate = $borrowing->borrowed_at->copy()->timezone($displayTimezone)->toDateString();
+
+                    if ($activityBuckets->has($borrowedDate)) {
+                        $bucket = $activityBuckets->get($borrowedDate);
+                        $bucket['borrowed']++;
+                        $activityBuckets->put($borrowedDate, $bucket);
+                    }
+                }
+
+                if ($borrowing->returned_at) {
+                    $returnedDate = $borrowing->returned_at->copy()->timezone($displayTimezone)->toDateString();
+
+                    if ($activityBuckets->has($returnedDate)) {
+                        $bucket = $activityBuckets->get($returnedDate);
+                        $bucket['returned']++;
+                        $activityBuckets->put($returnedDate, $bucket);
+                    }
+                }
             });
 
-        $maxStudyProgramValue = max($studyProgramChart->pluck('value')->max() ?? 1, 1);
+        $activityChart = $activityBuckets->values();
+        $maxActivityValue = max(
+            $activityChart->pluck('borrowed')->merge($activityChart->pluck('returned'))->max() ?? 1,
+            1
+        );
 
         $lockerStatusSummary = collect([
             ['label' => 'Tersedia', 'value' => Locker::query()->where('status', 'available')->count(), 'tone' => 'text-emerald-600 bg-emerald-50 ring-emerald-100'],
@@ -89,13 +118,49 @@ class DashboardController extends Controller
             ['label' => 'Telat Mengembalikan', 'value' => $borrowingStatusService->activeLateQuery()->count(), 'tone' => 'text-amber-600 bg-amber-50 ring-amber-100'],
         ]);
 
+        $espLocker = Locker::query()
+            ->whereNotNull('device_id')
+            ->where('device_id', '!=', '')
+            ->where('device_id', 'not like', 'DUMMY-%')
+            ->get()
+            ->sortByDesc(fn (Locker $locker) => ($locker->switch_reported_at ?? $locker->last_ping_at)?->timestamp ?? 0)
+            ->first();
+
+        $lastEspSync = $espLocker?->switch_reported_at ?? $espLocker?->last_ping_at;
+        $espSyncState = match (true) {
+            ! $lastEspSync => 'waiting',
+            $lastEspSync->greaterThanOrEqualTo(now()->subMinute()) => 'online',
+            $lastEspSync->greaterThanOrEqualTo(now()->subMinutes(5)) => 'recent',
+            default => 'stale',
+        };
+
+        $espSyncSummary = [
+            'locker' => $espLocker?->code ?? '-',
+            'device_id' => $espLocker?->device_id ?? '-',
+            'state' => $espSyncState,
+            'status' => match ($espSyncState) {
+                'online' => 'Online',
+                'recent' => 'Baru sinkron',
+                'stale' => 'Perlu dicek',
+                default => 'Menunggu ESP',
+            },
+            'time' => $lastEspSync
+                ? $lastEspSync->copy()->timezone($displayTimezone)->format('d/m/Y H:i:s')
+                : 'Belum ada data',
+            'synced_at' => $lastEspSync?->copy()->utc()->toIso8601String(),
+            'relative' => $lastEspSync
+                ? $lastEspSync->copy()->timezone($displayTimezone)->diffForHumans()
+                : 'ESP belum pernah mengirim status switch.',
+        ];
+
         return view('dashboard', [
             'stats' => $stats,
             'lockers' => $lockers,
             'isStudentView' => $isStudentView,
-            'studyProgramChart' => $studyProgramChart,
-            'maxStudyProgramValue' => $maxStudyProgramValue,
+            'activityChart' => $activityChart,
+            'maxActivityValue' => $maxActivityValue,
             'lockerStatusSummary' => $lockerStatusSummary,
+            'espSyncSummary' => $espSyncSummary,
         ]);
     }
 }
