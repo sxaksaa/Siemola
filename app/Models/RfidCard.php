@@ -4,31 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Locker extends Model
+class RfidCard extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'code',
-        'name',
-        'location',
-        'device_id',
-        'status',
-        'last_ping_at',
+        'uid',
+        'user_id',
     ];
 
-    protected function casts(): array
+    public function student(): BelongsTo
     {
-        return [
-            'last_ping_at' => 'datetime',
-        ];
-    }
-
-    public function borrowings(): HasMany
-    {
-        return $this->hasMany(Borrowing::class);
+        return $this->belongsTo(Student::class, 'user_id');
     }
 
     public function lockerAccesses(): HasMany

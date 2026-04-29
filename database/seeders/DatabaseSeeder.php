@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Locker;
+use App\Models\RfidCard;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -23,7 +24,9 @@ class DatabaseSeeder extends Seeder
         DB::table('sessions')->truncate();
         DB::table('password_reset_tokens')->truncate();
         DB::table('users')->truncate();
+        DB::table('locker_accesses')->truncate();
         DB::table('borrowings')->truncate();
+        DB::table('rfid_cards')->truncate();
         DB::table('students')->truncate();
         DB::table('lockers')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
@@ -61,9 +64,14 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($students as $student) {
-            Student::query()->updateOrCreate(
+            $createdStudent = Student::query()->updateOrCreate(
                 ['nim' => $student['nim']],
                 $student,
+            );
+
+            RfidCard::query()->updateOrCreate(
+                ['user_id' => $createdStudent->id],
+                ['uid' => $createdStudent->rfid_uid],
             );
         }
 

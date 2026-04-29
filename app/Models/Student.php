@@ -32,4 +32,14 @@ class Student extends Model
     {
         return $this->hasMany(Borrowing::class);
     }
+
+    public function rfidCards(): HasMany
+    {
+        return $this->hasMany(RfidCard::class, 'user_id');
+    }
+
+    public function lockerAccesses(): HasMany
+    {
+        return $this->hasMany(LockerAccess::class, 'user_id');
+    }
 }

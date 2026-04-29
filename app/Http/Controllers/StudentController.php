@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RfidCard;
 use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -45,7 +46,9 @@ class StudentController extends Controller
     {
         $validated = $request->validate($this->rules());
 
-        Student::create($validated);
+        $student = Student::create($validated);
+
+        $this->syncRfidCard($student);
 
         return redirect()
             ->route('students.index')
@@ -64,6 +67,7 @@ class StudentController extends Controller
         $validated = $request->validate($this->rules($student->id));
 
         $student->update($validated);
+        $this->syncRfidCard($student);
 
         return redirect()
             ->route('students.index')
@@ -90,5 +94,13 @@ class StudentController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'status' => ['required', 'in:active,inactive,blocked'],
         ];
+    }
+
+    private function syncRfidCard(Student $student): void
+    {
+        RfidCard::query()->updateOrCreate(
+            ['user_id' => $student->id],
+            ['uid' => $student->rfid_uid],
+        );
     }
 }

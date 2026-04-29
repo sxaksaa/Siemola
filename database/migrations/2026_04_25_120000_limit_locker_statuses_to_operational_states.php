@@ -11,11 +11,15 @@ return new class extends Migration
             ->whereIn('status', ['maintenance', 'offline'])
             ->update(['status' => 'available']);
 
-        DB::statement("ALTER TABLE lockers MODIFY status ENUM('available', 'borrowed', 'late') NOT NULL DEFAULT 'available'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE lockers MODIFY status ENUM('available', 'borrowed', 'late') NOT NULL DEFAULT 'available'");
+        }
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE lockers MODIFY status ENUM('available', 'borrowed', 'late', 'maintenance', 'offline') NOT NULL DEFAULT 'available'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE lockers MODIFY status ENUM('available', 'borrowed', 'late', 'maintenance', 'offline') NOT NULL DEFAULT 'available'");
+        }
     }
 };
