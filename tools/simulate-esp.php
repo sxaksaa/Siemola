@@ -20,7 +20,7 @@ if (in_array($command, ['help', '--help', '-h'], true)) {
 try {
     match ($command) {
         'check' => readLockerStatus($baseUrl, $deviceId),
-        'status' => sendSensorStatus($baseUrl, $deviceId, switchState($options['locstatus'] ?? $options['state'] ?? 1)),
+        'status' => sendSensorStatus($baseUrl, $deviceId, switchState($options['locstatus'] ?? $options['state'] ?? 0)),
         'tap' => sendTap($baseUrl, $deviceId, $uid),
         'borrow' => simulateBorrow($baseUrl, $deviceId, $uid),
         'return' => simulateReturn($baseUrl, $deviceId, $uid),
@@ -46,12 +46,12 @@ function simulateBorrow(string $baseUrl, string $deviceId, string $uid): bool
         return true;
     }
 
-    if ((int) ($current['switch_state'] ?? $current['locstatus'] ?? -1) !== 1) {
-        sendSensorStatus($baseUrl, $deviceId, 1);
+    if ((int) ($current['switch_state'] ?? $current['locstatus'] ?? -1) !== 0) {
+        sendSensorStatus($baseUrl, $deviceId, 0);
     }
 
     sendTap($baseUrl, $deviceId, $uid);
-    sendSensorStatus($baseUrl, $deviceId, 0);
+    sendSensorStatus($baseUrl, $deviceId, 1);
 
     return true;
 }
@@ -67,9 +67,9 @@ function simulateCycle(string $baseUrl, string $deviceId, string $uid): bool
 function simulateReturn(string $baseUrl, string $deviceId, string $uid): bool
 {
     writeln('Simulasi kembali: locker kosong, RFID tap, lalu barang masuk lagi.');
-    sendSensorStatus($baseUrl, $deviceId, 0);
-    sendTap($baseUrl, $deviceId, $uid);
     sendSensorStatus($baseUrl, $deviceId, 1);
+    sendTap($baseUrl, $deviceId, $uid);
+    sendSensorStatus($baseUrl, $deviceId, 0);
 
     return true;
 }
@@ -218,8 +218,8 @@ function showUsage(): void
 SIEMOLA ESP Simulator
 
 Contoh:
-  php tools/simulate-esp.php status --locstatus=1
   php tools/simulate-esp.php status --locstatus=0
+  php tools/simulate-esp.php status --locstatus=1
   php tools/simulate-esp.php check
   php tools/simulate-esp.php tap --uid="37 DB 7E 5"
   php tools/simulate-esp.php borrow
@@ -233,8 +233,9 @@ Opsi:
 
 Catatan:
   Default base URL simulator adalah http://127.0.0.1:8000 untuk php artisan serve.
-  locstatus=1 artinya switch ketekan / ada barang.
-  locstatus=0 artinya switch tidak ketekan / kosong.
+  Karena sketch memakai INPUT_PULLUP:
+  locstatus=0 artinya switch ketekan / ada barang.
+  locstatus=1 artinya switch tidak ketekan / kosong.
 TEXT);
 }
 

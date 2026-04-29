@@ -76,18 +76,18 @@ class DatabaseSeeder extends Seeder
         }
 
         $lockers = [
-            ['code' => 'L1', 'name' => 'Loker 1', 'location' => null, 'device_id' => '14:08:08:A6:69:34', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L2', 'name' => 'Loker 2 Dummy', 'location' => null, 'device_id' => 'DUMMY-L2', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L3', 'name' => 'Loker 3 Dummy', 'location' => null, 'device_id' => 'DUMMY-L3', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L4', 'name' => 'Loker 4 Dummy', 'location' => null, 'device_id' => 'DUMMY-L4', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L5', 'name' => 'Loker 5 Dummy', 'location' => null, 'device_id' => 'DUMMY-L5', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L6', 'name' => 'Loker 6 Dummy', 'location' => null, 'device_id' => 'DUMMY-L6', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L7', 'name' => 'Loker 7 Dummy', 'location' => null, 'device_id' => 'DUMMY-L7', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L8', 'name' => 'Loker 8 Dummy', 'location' => null, 'device_id' => 'DUMMY-L8', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L9', 'name' => 'Loker 9 Dummy', 'location' => null, 'device_id' => 'DUMMY-L9', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L10', 'name' => 'Loker 10 Dummy', 'location' => null, 'device_id' => 'DUMMY-L10', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L11', 'name' => 'Loker 11 Dummy', 'location' => null, 'device_id' => 'DUMMY-L11', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
-            ['code' => 'L12', 'name' => 'Loker 12 Dummy', 'location' => null, 'device_id' => 'DUMMY-L12', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 1, 'switch_reported_at' => null],
+            ['code' => 'L1', 'name' => 'Loker 1', 'location' => null, 'device_id' => '14:08:08:A6:69:34', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L2', 'name' => 'Loker 2 Dummy', 'location' => null, 'device_id' => 'DUMMY-L2', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L3', 'name' => 'Loker 3 Dummy', 'location' => null, 'device_id' => 'DUMMY-L3', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L4', 'name' => 'Loker 4 Dummy', 'location' => null, 'device_id' => 'DUMMY-L4', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L5', 'name' => 'Loker 5 Dummy', 'location' => null, 'device_id' => 'DUMMY-L5', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L6', 'name' => 'Loker 6 Dummy', 'location' => null, 'device_id' => 'DUMMY-L6', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L7', 'name' => 'Loker 7 Dummy', 'location' => null, 'device_id' => 'DUMMY-L7', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L8', 'name' => 'Loker 8 Dummy', 'location' => null, 'device_id' => 'DUMMY-L8', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L9', 'name' => 'Loker 9 Dummy', 'location' => null, 'device_id' => 'DUMMY-L9', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L10', 'name' => 'Loker 10 Dummy', 'location' => null, 'device_id' => 'DUMMY-L10', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L11', 'name' => 'Loker 11 Dummy', 'location' => null, 'device_id' => 'DUMMY-L11', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
+            ['code' => 'L12', 'name' => 'Loker 12 Dummy', 'location' => null, 'device_id' => 'DUMMY-L12', 'status' => 'available', 'last_ping_at' => null, 'switch_state' => 0, 'switch_reported_at' => null],
         ];
 
         foreach ($lockers as $locker) {

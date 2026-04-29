@@ -39,13 +39,13 @@
                                 <td class="siemola-td">{{ $locker->device_id ?: '-' }}</td>
                                 <td class="siemola-td">
                                     <span class="siemola-badge {{ match($locker->switch_state) {
-                                        1 => 'siemola-badge-active',
-                                        0 => 'siemola-badge-borrowed',
+                                        0 => 'siemola-badge-active',
+                                        1 => 'siemola-badge-borrowed',
                                         default => 'siemola-badge-inactive',
                                     } }}">
                                         {{ match($locker->switch_state) {
-                                            1 => 'Ada barang',
-                                            0 => 'Kosong',
+                                            0 => 'Ada barang',
+                                            1 => 'Kosong',
                                             default => 'Belum sinkron',
                                         } }}
                                     </span>

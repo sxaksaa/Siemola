@@ -22,7 +22,7 @@ return new class extends Migration
         DB::table('lockers')
             ->whereNull('switch_state')
             ->update([
-                'switch_state' => DB::raw("CASE WHEN status = 'available' THEN 1 ELSE 0 END"),
+                'switch_state' => DB::raw("CASE WHEN status = 'available' THEN 0 ELSE 1 END"),
             ]);
     }
 

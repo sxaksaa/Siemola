@@ -61,7 +61,7 @@ class EspLockerController extends Controller
                 return $this->tapFromBorrowingState($student, $rfidCard, $locker, $activeBorrowing);
             }
 
-            return (int) $locker->switch_state === 1
+            return (int) $locker->switch_state === 0
                 ? $this->borrowLocker($student, $rfidCard, $locker, $activeBorrowing)
                 : $this->returnLocker($student, $rfidCard, $locker, $activeBorrowing);
         });
@@ -324,14 +324,14 @@ class EspLockerController extends Controller
 
     private function statusFromSwitchState(int $switchState): string
     {
-        return $switchState === 1 ? 'available' : 'borrowed';
+        return $switchState === 0 ? 'available' : 'borrowed';
     }
 
     private function switchStateLabel(?int $switchState): string
     {
         return match ($switchState) {
-            1 => 'Ada barang',
-            0 => 'Kosong',
+            0 => 'Ada barang',
+            1 => 'Kosong',
             default => 'Belum sinkron',
         };
     }

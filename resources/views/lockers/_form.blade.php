@@ -25,7 +25,7 @@
 
     <div class="siemola-sensor-note">
         <span class="siemola-sensor-note-title">Status mengikuti switch ESP</span>
-        <span class="siemola-sensor-note-text">1 = ada barang / tersedia, 0 = kosong / sedang dipinjam.</span>
+        <span class="siemola-sensor-note-text">0 = ada barang / tersedia, 1 = kosong / sedang dipinjam.</span>
     </div>
 </div>
 
