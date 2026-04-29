@@ -1,7 +1,7 @@
 <x-siemola-layout title="Data Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin mengelola identitas loker, device ID, dan status operasional locker.">
-    <section class="space-y-6">
-        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <form method="GET" action="{{ route('lockers.index') }}" class="w-full xl:max-w-4xl">
+    <section class="siemola-page-stack">
+        <div class="siemola-toolbar">
+            <form method="GET" action="{{ route('lockers.index') }}" class="siemola-toolbar-search">
                 <label class="siemola-search-shell xl:max-w-none">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-5 w-5 text-slate-400">
                         <path d="m21 21-4.35-4.35M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" stroke-linecap="round" stroke-linejoin="round" />
@@ -18,11 +18,11 @@
             </a>
         </div>
 
-        <section class="overflow-hidden rounded-[30px] bg-white shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
+        <section class="siemola-table-card">
+            <div class="siemola-table-scroll">
+                <table class="siemola-table">
                     <thead>
-                        <tr class="border-b border-slate-200 bg-white text-slate-900">
+                        <tr class="siemola-table-head">
                             <th class="siemola-th">Kode Loker</th>
                             <th class="siemola-th">Nama</th>
                             <th class="siemola-th">Device ID</th>
@@ -32,7 +32,7 @@
                     </thead>
                     <tbody>
                         @forelse ($lockers as $locker)
-                            <tr class="border-b border-slate-100 last:border-b-0">
+                            <tr class="siemola-table-row">
                                 <td class="siemola-td font-medium text-slate-800">{{ $locker->code }}</td>
                                 <td class="siemola-td">{{ $locker->name }}</td>
                                 <td class="siemola-td">{{ $locker->device_id ?: '-' }}</td>
@@ -52,7 +52,7 @@
                                     </span>
                                 </td>
                                 <td class="siemola-td">
-                                    <div class="flex items-center justify-center gap-3">
+                                    <div class="siemola-row-actions">
                                         <a href="{{ route('lockers.edit', $locker) }}" class="siemola-icon-action text-blue-500" aria-label="Edit loker">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-5 w-5">
                                                 <path d="M4 20h4l10.5-10.5a2.12 2.12 0 0 0-3-3L5 17v3Z" stroke-linecap="round" stroke-linejoin="round" />
@@ -73,7 +73,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-10 text-center text-sm font-medium text-slate-400">Belum ada data loker yang cocok dengan pencarian.</td>
+                                <td colspan="5" class="siemola-table-empty">Belum ada data loker yang cocok dengan pencarian.</td>
                             </tr>
                         @endforelse
                     </tbody>

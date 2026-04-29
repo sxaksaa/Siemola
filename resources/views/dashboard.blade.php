@@ -16,7 +16,7 @@
     @endphp
 
     @unless ($isStudentView)
-        <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <section class="siemola-stat-grid">
             @foreach ($stats as $stat)
                 <article class="siemola-stat-card {{ $accentClasses[$stat['accent']] ?? 'siemola-accent-blue' }}">
                     <div>
@@ -33,14 +33,14 @@
             @endforeach
         </section>
 
-        <section class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-            <article class="rounded-[30px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 sm:p-7">
+        <section class="siemola-dashboard-grid">
+            <article class="siemola-dashboard-card">
                 <div>
-                    <h2 class="text-2xl font-extrabold tracking-tight text-slate-950">Statistik Sistem</h2>
-                    <p class="mt-1 text-sm font-medium text-slate-400">Grafik jumlah mahasiswa berdasarkan program studi yang tersimpan di database saat ini.</p>
+                    <h2 class="siemola-card-title">Statistik Sistem</h2>
+                    <p class="siemola-card-caption">Grafik jumlah mahasiswa berdasarkan program studi yang tersimpan di database saat ini.</p>
                 </div>
 
-                <div class="mt-8">
+                <div class="siemola-chart-area">
                     @if ($studyProgramChart->isNotEmpty())
                         @php
                             $chartItems = $studyProgramChart->values();
@@ -67,9 +67,9 @@
                             $areaPointString = "{$chartPadding},".($chartHeight - $chartPadding).' '.$pointString.' '.($chartWidth - $chartPadding).','.($chartHeight - $chartPadding);
                         @endphp
 
-                        <div class="overflow-hidden rounded-[24px] bg-slate-50 p-4 ring-1 ring-slate-200">
-                            <div class="overflow-x-auto">
-                                <svg viewBox="0 0 {{ $chartWidth }} {{ $chartHeight + 54 }}" role="img" aria-label="Grafik line statistik mahasiswa per program studi" class="min-w-[640px]">
+                        <div class="siemola-chart-frame">
+                            <div class="siemola-chart-scroll">
+                                <svg viewBox="0 0 {{ $chartWidth }} {{ $chartHeight + 54 }}" role="img" aria-label="Grafik line statistik mahasiswa per program studi" class="siemola-chart-svg">
                                     <defs>
                                         <linearGradient id="study-line-fill" x1="0" x2="0" y1="0" y2="1">
                                             <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
@@ -100,22 +100,22 @@
                             </div>
                         </div>
                     @else
-                        <div class="rounded-[24px] bg-slate-50 px-5 py-12 text-center ring-1 ring-slate-200">
-                            <p class="text-sm font-semibold text-slate-400">Belum ada data mahasiswa untuk divisualisasikan.</p>
+                        <div class="siemola-chart-empty">
+                            <p class="siemola-chart-empty-text">Belum ada data mahasiswa untuk divisualisasikan.</p>
                         </div>
                     @endif
                 </div>
             </article>
 
-            <article class="rounded-[30px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 sm:p-7">
+            <article class="siemola-dashboard-card">
                 <div>
-                    <h2 class="text-2xl font-extrabold tracking-tight text-slate-950">Ringkasan Loker</h2>
-                    <p class="mt-1 text-sm font-medium text-slate-400">Status operasional locker berdasarkan data real dari tabel `lockers`.</p>
+                    <h2 class="siemola-card-title">Ringkasan Loker</h2>
+                    <p class="siemola-card-caption">Status operasional locker berdasarkan data real dari tabel `lockers`.</p>
                 </div>
 
-                <div class="mt-8 space-y-4">
+                <div class="siemola-summary-list">
                     @foreach ($lockerStatusSummary as $summary)
-                        <div class="flex items-center justify-between rounded-2xl px-4 py-4 ring-1 {{ $summary['tone'] }}">
+                        <div class="siemola-summary-row {{ $summary['tone'] }}">
                             <span class="text-sm font-bold">{{ $summary['label'] }}</span>
                             <span class="text-2xl font-extrabold">{{ $summary['value'] }}</span>
                         </div>
@@ -125,13 +125,13 @@
         </section>
     @endunless
 
-    <section class="{{ $isStudentView ? '' : 'mt-8' }} rounded-[30px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 sm:p-7">
+    <section class="siemola-locker-section {{ $isStudentView ? '' : 'siemola-locker-section-spaced' }}">
         <div>
-            <h2 class="text-2xl font-extrabold tracking-tight text-slate-950">Status Loker</h2>
-            <p class="mt-1 text-sm font-medium text-slate-400">{{ $isStudentView ? 'Mahasiswa hanya bisa melihat ketersediaan locker sebelum melakukan tap RFID.' : 'Informasi Status Ketersedian Locker secara Real-time' }}</p>
+            <h2 class="siemola-card-title">Status Loker</h2>
+            <p class="siemola-card-caption">{{ $isStudentView ? 'Mahasiswa hanya bisa melihat ketersediaan locker sebelum melakukan tap RFID.' : 'Informasi Status Ketersedian Locker secara Real-time' }}</p>
         </div>
 
-        <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+        <div class="siemola-locker-grid">
             @foreach ($lockers as $locker)
                 <article class="siemola-locker-card {{ $lockerClasses[$locker['state']] ?? 'siemola-locker-available' }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-7 w-7">

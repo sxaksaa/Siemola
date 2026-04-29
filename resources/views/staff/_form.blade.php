@@ -1,5 +1,5 @@
-<div class="grid gap-5 md:grid-cols-2">
-    <div class="md:col-span-2">
+<div class="siemola-form-grid">
+    <div class="siemola-form-full">
         <label for="name" class="siemola-label">Nama</label>
         <input id="name" name="name" type="text" value="{{ old('name', $staff->name) }}" class="siemola-input" required>
         @error('name')
@@ -58,10 +58,10 @@
 </div>
 
 @if ($isEdit)
-    <p class="mt-4 text-sm text-slate-400">Kosongkan password jika tidak ingin mengubah password staff.</p>
+    <p class="siemola-muted-note">Kosongkan password jika tidak ingin mengubah password staff.</p>
 @endif
 
-<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+<div class="siemola-form-actions">
     <button type="submit" class="siemola-primary-button">{{ $submitLabel }}</button>
     <a href="{{ route('staff.index') }}" class="siemola-secondary-button">Batal</a>
 </div>

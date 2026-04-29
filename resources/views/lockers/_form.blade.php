@@ -1,4 +1,4 @@
-<div class="grid gap-5 md:grid-cols-2">
+<div class="siemola-form-grid">
     <div>
         <label for="code" class="siemola-label">Kode Loker</label>
         <input id="code" name="code" type="text" value="{{ old('code', $locker->code) }}" class="siemola-input" required>
@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+<div class="siemola-form-actions">
     <button type="submit" class="siemola-primary-button">{{ $submitLabel }}</button>
     <a href="{{ route('lockers.index') }}" class="siemola-secondary-button">Batal</a>
 </div>

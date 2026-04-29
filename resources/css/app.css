@@ -21,9 +21,135 @@
 
 @layer components {
     .siemola-sidebar {
+        @apply w-full shrink-0 px-5 py-6 lg:sticky lg:top-0 lg:h-screen lg:w-[260px] lg:overflow-y-auto;
         background:
             radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 30%),
             linear-gradient(180deg, #17233d 0%, #121a30 100%);
+    }
+
+    .siemola-layout {
+        @apply flex min-h-screen flex-col lg:flex-row;
+    }
+
+    .siemola-brand {
+        @apply flex items-center gap-3 rounded-[22px] bg-white/5 px-4 py-4;
+    }
+
+    .siemola-brand-icon {
+        @apply flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-900 shadow-lg shadow-slate-950/20;
+    }
+
+    .siemola-brand-title {
+        @apply text-3xl font-extrabold tracking-tight text-white;
+    }
+
+    .siemola-brand-subtitle {
+        @apply text-sm text-slate-400;
+    }
+
+    .siemola-side-nav {
+        @apply mt-10 space-y-3;
+    }
+
+    .siemola-main-shell {
+        @apply flex-1;
+        background: var(--siemola-surface);
+    }
+
+    .siemola-topbar {
+        @apply sticky top-0 z-30 border-b border-slate-200 bg-white/90 px-5 py-5 backdrop-blur sm:px-7 lg:px-10;
+    }
+
+    .siemola-topbar-inner {
+        @apply flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between;
+    }
+
+    .siemola-page-title {
+        @apply inline-block text-3xl font-extrabold tracking-tight text-slate-950;
+    }
+
+    .siemola-topbar-actions {
+        @apply flex items-center justify-between gap-4 sm:justify-end;
+    }
+
+    .siemola-main-content {
+        @apply px-5 py-6 sm:px-7 lg:px-10;
+    }
+
+    .siemola-dropdown-surface {
+        @apply rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_24px_60px_rgba(15,23,42,0.12)];
+    }
+
+    .siemola-icon-button {
+        @apply relative flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-slate-300 hover:bg-slate-50;
+    }
+
+    .siemola-notification-dot {
+        @apply absolute right-2 top-2 inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white;
+    }
+
+    .siemola-notification-menu {
+        @apply w-80 p-2;
+    }
+
+    .siemola-dropdown-header {
+        @apply border-b border-slate-100 px-2 pb-3;
+    }
+
+    .siemola-dropdown-title {
+        @apply text-sm font-extrabold text-slate-950;
+    }
+
+    .siemola-dropdown-muted {
+        @apply mt-1 text-xs font-medium text-slate-400;
+    }
+
+    .siemola-notification-list {
+        @apply mt-2 space-y-1;
+    }
+
+    .siemola-notification-item {
+        @apply block rounded-2xl px-3 py-3 transition hover:bg-amber-50;
+    }
+
+    .siemola-notification-name {
+        @apply text-sm font-bold text-slate-900;
+    }
+
+    .siemola-notification-text {
+        @apply mt-1 text-xs leading-5 text-slate-500;
+    }
+
+    .siemola-empty-message {
+        @apply px-3 py-5 text-center text-sm font-medium text-slate-400;
+    }
+
+    .siemola-dropdown-footer-link {
+        @apply mt-2 block rounded-2xl px-3 py-3 text-center text-sm font-bold text-blue-600 transition hover:bg-blue-50;
+    }
+
+    .siemola-user-trigger {
+        @apply flex items-center gap-3 rounded-full px-2 py-1 transition hover:bg-slate-50;
+    }
+
+    .siemola-user-avatar {
+        @apply flex h-14 w-14 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-500/30;
+    }
+
+    .siemola-user-name {
+        @apply text-base font-bold text-slate-900;
+    }
+
+    .siemola-user-role {
+        @apply text-sm font-medium text-slate-400;
+    }
+
+    .siemola-guest-user {
+        @apply hidden text-right sm:block;
+    }
+
+    .siemola-flash {
+        @apply mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700;
     }
 
     .siemola-nav-item {
@@ -139,6 +265,118 @@
         @apply transition hover:scale-110;
     }
 
+    .siemola-page-stack {
+        @apply space-y-6;
+    }
+
+    .siemola-toolbar {
+        @apply flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between;
+    }
+
+    .siemola-toolbar-search {
+        @apply w-full xl:max-w-4xl;
+    }
+
+    .siemola-panel {
+        @apply rounded-[24px] bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.05)] ring-1 ring-slate-200/70 sm:p-6;
+    }
+
+    .siemola-table-card {
+        @apply overflow-hidden rounded-[30px] bg-white shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70;
+    }
+
+    .siemola-table-card-compact {
+        @apply overflow-hidden rounded-[24px] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.05)] ring-1 ring-slate-200/70;
+    }
+
+    .siemola-table-scroll {
+        @apply overflow-x-auto;
+    }
+
+    .siemola-table {
+        @apply min-w-full text-sm;
+    }
+
+    .siemola-table-head {
+        @apply border-b border-slate-200 bg-white text-slate-900;
+    }
+
+    .siemola-table-head-muted {
+        @apply border-b border-slate-200 bg-slate-50 text-slate-950;
+    }
+
+    .siemola-table-row {
+        @apply border-b border-slate-100 last:border-b-0;
+    }
+
+    .siemola-table-empty {
+        @apply px-5 py-10 text-center text-sm font-medium text-slate-400;
+    }
+
+    .siemola-row-actions {
+        @apply flex items-center justify-center gap-3;
+    }
+
+    .siemola-form-grid {
+        @apply grid gap-5 md:grid-cols-2;
+    }
+
+    .siemola-form-full {
+        @apply md:col-span-2;
+    }
+
+    .siemola-form-actions {
+        @apply mt-8 flex flex-col gap-3 sm:flex-row;
+    }
+
+    .siemola-form-intro {
+        @apply mb-6;
+    }
+
+    .siemola-form-title {
+        @apply text-2xl font-extrabold text-slate-950;
+    }
+
+    .siemola-form-description {
+        @apply mt-1 text-sm font-medium text-slate-400;
+    }
+
+    .siemola-muted-note {
+        @apply mt-4 text-sm text-slate-400;
+    }
+
+    .siemola-filter-grid {
+        @apply grid gap-5 xl:grid-cols-[minmax(0,1fr)_240px] xl:items-end;
+    }
+
+    .siemola-filter-fields {
+        @apply mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(260px,1fr)];
+    }
+
+    .siemola-date-grid {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .siemola-status-pill {
+        @apply inline-flex min-w-28 justify-center rounded-full px-4 py-2 text-sm font-bold;
+    }
+
+    .siemola-status-borrowed {
+        @apply bg-rose-500 text-white;
+    }
+
+    .siemola-status-returned {
+        @apply bg-blue-500 text-white;
+    }
+
+    .siemola-status-late {
+        @apply bg-amber-500 text-white;
+    }
+
+    .siemola-status-neutral {
+        @apply bg-slate-200 text-slate-600;
+    }
+
     .siemola-info-card {
         @apply rounded-[24px] bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.05)] ring-1 ring-slate-200/70;
     }
@@ -175,6 +413,10 @@
         @apply block rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900;
     }
 
+    .siemola-dropdown-danger {
+        @apply w-full text-left text-rose-500 hover:bg-rose-50;
+    }
+
     .siemola-badge {
         @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold;
     }
@@ -193,6 +435,708 @@
 
     .siemola-badge-late {
         @apply bg-amber-100 text-amber-700;
+    }
+
+    .siemola-stat-grid {
+        @apply grid gap-4 md:grid-cols-2 xl:grid-cols-3;
+    }
+
+    .siemola-dashboard-grid {
+        @apply mt-8 grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)];
+    }
+
+    .siemola-dashboard-card {
+        @apply rounded-[30px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 sm:p-7;
+    }
+
+    .siemola-card-title {
+        @apply text-2xl font-extrabold tracking-tight text-slate-950;
+    }
+
+    .siemola-card-caption {
+        @apply mt-1 text-sm font-medium text-slate-400;
+    }
+
+    .siemola-chart-area {
+        @apply mt-8;
+    }
+
+    .siemola-chart-frame {
+        @apply overflow-hidden rounded-[24px] bg-slate-50 p-4 ring-1 ring-slate-200;
+    }
+
+    .siemola-chart-scroll {
+        @apply overflow-x-auto;
+    }
+
+    .siemola-chart-svg {
+        @apply min-w-[640px];
+    }
+
+    .siemola-chart-empty {
+        @apply rounded-[24px] bg-slate-50 px-5 py-12 text-center ring-1 ring-slate-200;
+    }
+
+    .siemola-chart-empty-text {
+        @apply text-sm font-semibold text-slate-400;
+    }
+
+    .siemola-summary-list {
+        @apply mt-8 space-y-4;
+    }
+
+    .siemola-summary-row {
+        @apply flex items-center justify-between rounded-2xl px-4 py-4 ring-1;
+    }
+
+    .siemola-locker-section {
+        @apply rounded-[30px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 sm:p-7;
+    }
+
+    .siemola-locker-section-spaced {
+        @apply mt-8;
+    }
+
+    .siemola-locker-grid {
+        @apply mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-6;
+    }
+
+    .siemola-auth-shell {
+        @apply min-h-screen flex-col bg-gray-100 font-sans antialiased;
+    }
+
+    .siemola-auth-content {
+        @apply min-h-screen flex flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0;
+    }
+
+    .siemola-auth-card {
+        @apply mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg;
+    }
+
+    .siemola-app-page {
+        @apply min-h-screen bg-gray-100;
+    }
+
+    .siemola-app-header {
+        @apply bg-white shadow;
+    }
+
+    .siemola-app-header-inner {
+        @apply mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8;
+    }
+
+    .siemola-profile-shell {
+        @apply py-12;
+    }
+
+    .siemola-profile-stack {
+        @apply mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8;
+    }
+
+    .siemola-profile-card {
+        @apply bg-white p-4 shadow sm:rounded-lg sm:p-8;
+    }
+
+    .siemola-profile-card-inner {
+        @apply max-w-xl;
+    }
+
+    .siemola-auth-link {
+        @apply rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+    }
+
+    .siemola-auth-link-button {
+        @apply rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+    }
+
+    .siemola-auth-checkbox {
+        @apply rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500;
+    }
+
+    .siemola-breeze-primary {
+        @apply inline-flex items-center rounded-md border border-transparent bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition ease-in-out duration-150 hover:bg-gray-700 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:bg-gray-900;
+    }
+
+    .siemola-breeze-secondary {
+        @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm transition ease-in-out duration-150 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25;
+    }
+
+    .siemola-breeze-danger {
+        @apply inline-flex items-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition ease-in-out duration-150 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 active:bg-red-700;
+    }
+
+    .siemola-breeze-input {
+        @apply rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500;
+    }
+
+    .siemola-breeze-dropdown-link {
+        @apply block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none;
+    }
+
+    .siemola-breeze-dropdown-position {
+        @apply absolute z-50 mt-2 rounded-md shadow-lg;
+    }
+
+    .siemola-breeze-dropdown-frame {
+        @apply rounded-md ring-1 ring-black ring-opacity-5;
+    }
+
+    .siemola-breeze-nav {
+        @apply border-b border-gray-100 bg-white;
+    }
+
+    .siemola-breeze-nav-inner {
+        @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+
+    .siemola-breeze-nav-row {
+        @apply flex h-16 justify-between;
+    }
+
+    .siemola-breeze-nav-left {
+        @apply flex;
+    }
+
+    .siemola-breeze-logo {
+        @apply flex shrink-0 items-center;
+    }
+
+    .siemola-breeze-links {
+        @apply hidden space-x-8 sm:-my-px sm:ms-10 sm:flex;
+    }
+
+    .siemola-breeze-settings {
+        @apply hidden sm:ms-6 sm:flex sm:items-center;
+    }
+
+    .siemola-breeze-user-trigger {
+        @apply inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition ease-in-out duration-150 hover:text-gray-700 focus:outline-none;
+    }
+
+    .siemola-breeze-hamburger {
+        @apply -me-2 flex items-center sm:hidden;
+    }
+
+    .siemola-breeze-hamburger-button {
+        @apply inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none;
+    }
+
+    .siemola-breeze-mobile-menu {
+        @apply hidden sm:hidden;
+    }
+
+    .siemola-breeze-mobile-links {
+        @apply space-y-1 pb-3 pt-2;
+    }
+
+    .siemola-breeze-mobile-settings {
+        @apply border-t border-gray-200 pb-1 pt-4;
+    }
+
+    .siemola-breeze-user-block {
+        @apply px-4;
+    }
+
+    .siemola-breeze-user-label {
+        @apply text-base font-medium text-gray-800;
+    }
+
+    .siemola-breeze-user-email {
+        @apply text-sm font-medium text-gray-500;
+    }
+
+    .siemola-breeze-mobile-actions {
+        @apply mt-3 space-y-1;
+    }
+
+    .siemola-breeze-nav-link {
+        @apply inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none;
+    }
+
+    .siemola-breeze-nav-link-active {
+        @apply border-indigo-400 text-gray-900 focus:border-indigo-700;
+    }
+
+    .siemola-breeze-nav-link-idle {
+        @apply border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700;
+    }
+
+    .siemola-breeze-responsive-link {
+        @apply block w-full border-l-4 py-2 pe-4 ps-3 text-start text-base font-medium transition duration-150 ease-in-out focus:outline-none;
+    }
+
+    .siemola-breeze-responsive-link-active {
+        @apply border-indigo-400 bg-indigo-50 text-indigo-700 focus:border-indigo-700 focus:bg-indigo-100 focus:text-indigo-800;
+    }
+
+    .siemola-breeze-responsive-link-idle {
+        @apply border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 focus:border-gray-300 focus:bg-gray-50 focus:text-gray-800;
+    }
+
+    .siemola-modal-shell {
+        @apply fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0;
+    }
+
+    .siemola-modal-backdrop {
+        @apply fixed inset-0 transform transition-all;
+    }
+
+    .siemola-modal-backdrop-fill {
+        @apply absolute inset-0 bg-gray-500 opacity-75;
+    }
+
+    .siemola-modal-panel {
+        @apply mb-6 overflow-hidden rounded-lg bg-white shadow-xl transform transition-all sm:mx-auto sm:w-full;
+    }
+
+    .siemola-login-page {
+        @apply min-h-screen bg-[#eef2f7] font-sans text-slate-900;
+    }
+
+    .siemola-login-shell {
+        @apply grid min-h-screen lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)];
+    }
+
+    .siemola-login-panel {
+        @apply hidden bg-[#121a30] px-10 py-10 text-white lg:flex lg:flex-col lg:justify-between;
+    }
+
+    .siemola-login-panel::before {
+        content: none;
+    }
+
+    .siemola-login-brand {
+        @apply flex items-center gap-3;
+    }
+
+    .siemola-login-logo {
+        @apply flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-950 shadow-lg shadow-slate-950/30;
+    }
+
+    .siemola-login-brand-title {
+        @apply text-3xl font-extrabold tracking-tight;
+    }
+
+    .siemola-login-brand-subtitle {
+        @apply text-sm font-medium text-slate-300;
+    }
+
+    .siemola-login-copy {
+        @apply max-w-xl;
+    }
+
+    .siemola-login-eyebrow {
+        @apply text-sm font-bold uppercase tracking-[0.18em] text-blue-200;
+    }
+
+    .siemola-login-heading {
+        @apply mt-5 text-5xl font-extrabold leading-tight tracking-tight;
+    }
+
+    .siemola-login-description {
+        @apply mt-5 max-w-lg text-base leading-8 text-slate-300;
+    }
+
+    .siemola-login-metrics {
+        @apply grid gap-4 sm:grid-cols-3;
+    }
+
+    .siemola-login-metric {
+        @apply rounded-[24px] border border-white/10 bg-white/[0.06] p-5;
+    }
+
+    .siemola-login-metric-value {
+        @apply text-2xl font-extrabold;
+    }
+
+    .siemola-login-metric-label {
+        @apply mt-1 text-xs font-semibold uppercase tracking-wide text-slate-300;
+    }
+
+    .siemola-login-form-side {
+        @apply flex min-h-screen items-center justify-center px-5 py-10 sm:px-8;
+    }
+
+    .siemola-login-card {
+        @apply w-full max-w-md rounded-[32px] bg-white p-7 shadow-[0_28px_80px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/80 sm:p-8;
+    }
+
+    .siemola-login-mobile-brand {
+        @apply mb-8 flex items-center gap-3 lg:hidden;
+    }
+
+    .siemola-login-mobile-logo {
+        @apply flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500 text-white;
+    }
+
+    .siemola-login-title {
+        @apply text-3xl font-extrabold tracking-tight text-slate-950;
+    }
+
+    .siemola-login-caption {
+        @apply mt-2 text-sm leading-6 text-slate-500;
+    }
+
+    .siemola-login-form {
+        @apply mt-8 space-y-5;
+    }
+
+    .siemola-login-field {
+        @apply space-y-2;
+    }
+
+    .siemola-login-label {
+        @apply block text-sm font-bold text-slate-700;
+    }
+
+    .siemola-login-input {
+        @apply block w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100;
+    }
+
+    .siemola-login-options {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .siemola-login-check {
+        @apply inline-flex items-center gap-2 text-sm font-semibold text-slate-600;
+    }
+
+    .siemola-login-checkbox {
+        @apply rounded border-slate-300 text-blue-600 shadow-sm focus:ring-blue-500;
+    }
+
+    .siemola-login-link {
+        @apply text-sm font-bold text-blue-600 transition hover:text-blue-700;
+    }
+
+    .siemola-login-button {
+        @apply inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-5 py-4 text-sm font-extrabold text-white shadow-[0_18px_36px_rgba(37,99,235,0.25)] transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200;
+    }
+
+    .siemola-login-status {
+        @apply mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700;
+    }
+
+    .siemola-profile-hero {
+        @apply mb-6 overflow-hidden rounded-[30px] bg-white shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70;
+    }
+
+    .siemola-profile-hero-inner {
+        @apply flex flex-col gap-5 p-6 sm:p-7 lg:flex-row lg:items-center lg:justify-between;
+    }
+
+    .siemola-profile-identity {
+        @apply flex items-center gap-4;
+    }
+
+    .siemola-profile-avatar {
+        @apply flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 text-2xl font-extrabold text-white shadow-lg shadow-blue-500/25;
+    }
+
+    .siemola-profile-name {
+        @apply text-2xl font-extrabold tracking-tight text-slate-950;
+    }
+
+    .siemola-profile-meta {
+        @apply mt-1 text-sm font-medium text-slate-500;
+    }
+
+    .siemola-profile-badge {
+        @apply inline-flex rounded-full bg-blue-50 px-4 py-2 text-sm font-extrabold text-blue-700 ring-1 ring-blue-100;
+    }
+
+    .siemola-profile-grid {
+        @apply grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,0.75fr)];
+    }
+
+    .siemola-profile-stack-clean {
+        @apply space-y-6;
+    }
+
+    .siemola-profile-panel {
+        @apply rounded-[30px] bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 sm:p-7;
+    }
+
+    .siemola-profile-panel-danger {
+        @apply rounded-[30px] border border-rose-100 bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] ring-1 ring-rose-100 sm:p-7;
+    }
+
+    .siemola-profile-title {
+        @apply text-xl font-extrabold text-slate-950;
+    }
+
+    .siemola-profile-description {
+        @apply mt-1 text-sm leading-6 text-slate-500;
+    }
+
+    .siemola-profile-form {
+        @apply mt-6 space-y-5;
+    }
+
+    .siemola-profile-actions {
+        @apply flex flex-col gap-3 pt-2 sm:flex-row sm:items-center;
+    }
+
+    .siemola-profile-saved {
+        @apply text-sm font-semibold text-emerald-600;
+    }
+
+    .siemola-profile-danger-text {
+        @apply mt-4 text-sm leading-6 text-slate-500;
+    }
+
+    .siemola-profile-danger-button {
+        @apply mt-6 inline-flex items-center justify-center rounded-2xl bg-rose-500 px-6 py-4 text-sm font-extrabold text-white shadow-[0_16px_30px_rgba(244,63,94,0.22)] transition hover:bg-rose-600 focus:outline-none focus:ring-4 focus:ring-rose-100;
+    }
+
+    @keyframes siemola-fade-up {
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes siemola-soft-pop {
+        0% {
+            opacity: 0;
+            transform: scale(0.96);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes siemola-status-pulse {
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.34);
+        }
+
+        50% {
+            box-shadow: 0 0 0 8px rgba(244, 63, 94, 0);
+        }
+    }
+
+    .siemola-page-title::after {
+        content: "";
+        @apply mt-2 block h-1 rounded-full bg-blue-500;
+        width: 100%;
+    }
+
+    .siemola-main-content > *,
+    .siemola-login-card,
+    .siemola-profile-hero,
+    .siemola-profile-panel,
+    .siemola-profile-panel-danger {
+        animation: siemola-fade-up 420ms ease-out both;
+    }
+
+    .siemola-login-panel {
+        animation: siemola-soft-pop 480ms ease-out both;
+    }
+
+    .siemola-dashboard-grid .siemola-dashboard-card:nth-child(2),
+    .siemola-profile-panel-danger,
+    .siemola-table-card,
+    .siemola-table-card-compact {
+        animation-delay: 70ms;
+    }
+
+    .siemola-stat-card:nth-child(2),
+    .siemola-locker-grid .siemola-locker-card:nth-child(2n),
+    .siemola-profile-panel:nth-child(2) {
+        animation-delay: 90ms;
+    }
+
+    .siemola-stat-card:nth-child(3),
+    .siemola-locker-grid .siemola-locker-card:nth-child(3n) {
+        animation-delay: 140ms;
+    }
+
+    .siemola-topbar {
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    }
+
+    .siemola-nav-item,
+    .siemola-primary-button,
+    .siemola-secondary-button,
+    .siemola-icon-button,
+    .siemola-user-trigger,
+    .siemola-login-button,
+    .siemola-profile-danger-button,
+    .siemola-search-shell,
+    .siemola-input,
+    .siemola-login-input {
+        transition-duration: 180ms;
+        transition-property: background-color, border-color, box-shadow, color, opacity, transform;
+        transition-timing-function: ease-out;
+    }
+
+    .siemola-nav-item:hover,
+    .siemola-user-trigger:hover,
+    .siemola-icon-button:hover {
+        transform: translateY(-1px);
+    }
+
+    .siemola-nav-item-active {
+        position: relative;
+    }
+
+    .siemola-nav-item-active::before {
+        content: "";
+        @apply absolute left-2 h-2 w-2 rounded-full bg-blue-300;
+    }
+
+    .siemola-primary-button:hover,
+    .siemola-secondary-button:hover,
+    .siemola-login-button:hover,
+    .siemola-profile-danger-button:hover {
+        transform: translateY(-2px);
+    }
+
+    .siemola-primary-button:active,
+    .siemola-secondary-button:active,
+    .siemola-login-button:active,
+    .siemola-profile-danger-button:active {
+        transform: translateY(0);
+    }
+
+    .siemola-stat-card,
+    .siemola-dashboard-card,
+    .siemola-table-card,
+    .siemola-table-card-compact,
+    .siemola-form-card,
+    .siemola-panel,
+    .siemola-profile-panel,
+    .siemola-profile-panel-danger,
+    .siemola-login-card,
+    .siemola-locker-section {
+        transition: border-color 180ms ease-out, box-shadow 180ms ease-out, transform 180ms ease-out;
+    }
+
+    .siemola-stat-card:hover,
+    .siemola-dashboard-card:hover,
+    .siemola-table-card:hover,
+    .siemola-table-card-compact:hover,
+    .siemola-form-card:hover,
+    .siemola-panel:hover,
+    .siemola-profile-panel:hover,
+    .siemola-login-card:hover,
+    .siemola-locker-section:hover {
+        box-shadow: 0 28px 80px rgba(15, 23, 42, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .siemola-stat-card:hover .siemola-stat-icon,
+    .siemola-locker-card:hover svg,
+    .siemola-login-brand:hover .siemola-login-logo,
+    .siemola-login-mobile-brand:hover .siemola-login-mobile-logo {
+        transform: translateY(-1px) scale(1.03);
+    }
+
+    .siemola-stat-icon,
+    .siemola-locker-card svg,
+    .siemola-login-logo,
+    .siemola-login-mobile-logo {
+        transition: transform 180ms ease-out;
+    }
+
+    .siemola-search-shell:focus-within,
+    .siemola-search-shell:hover {
+        box-shadow: 0 20px 46px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .siemola-input:focus,
+    .siemola-login-input:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 34px rgba(37, 99, 235, 0.1);
+    }
+
+    .siemola-table-row {
+        transition: background-color 150ms ease-out, transform 150ms ease-out;
+    }
+
+    .siemola-table-row:hover {
+        background: rgba(239, 246, 255, 0.72);
+    }
+
+    .siemola-badge,
+    .siemola-status-pill,
+    .siemola-profile-badge {
+        transition: transform 160ms ease-out, box-shadow 160ms ease-out;
+    }
+
+    .siemola-badge:hover,
+    .siemola-status-pill:hover,
+    .siemola-profile-badge:hover {
+        transform: translateY(-1px);
+    }
+
+    .siemola-notification-dot {
+        animation: siemola-status-pulse 1.8s ease-in-out infinite;
+    }
+
+    .siemola-notification-item {
+        transition: background-color 160ms ease-out, transform 160ms ease-out;
+    }
+
+    .siemola-notification-item:hover {
+        transform: translateX(2px);
+    }
+
+    .siemola-locker-available {
+        box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.05);
+    }
+
+    .siemola-locker-borrowed {
+        box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.05);
+    }
+
+    .siemola-locker-late {
+        box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.05);
+    }
+
+    .siemola-locker-card:hover {
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .siemola-chart-svg polyline,
+    .siemola-chart-svg circle {
+        transition: opacity 180ms ease-out, transform 180ms ease-out;
+    }
+
+    .siemola-chart-frame:hover .siemola-chart-svg circle {
+        transform: scale(1.05);
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    .siemola-login-metric {
+        transition: background-color 180ms ease-out, border-color 180ms ease-out, transform 180ms ease-out;
+    }
+
+    .siemola-login-metric:hover {
+        @apply border-white/20 bg-white/10;
+        transform: translateY(-2px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 1ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+            transition-duration: 1ms !important;
+        }
     }
 
 }

@@ -34,22 +34,22 @@
             ])->filter(fn ($item) => in_array($user?->role ?? 'guest', $item['roles'], true));
         @endphp
 
-        <div class="flex min-h-screen flex-col lg:flex-row">
-            <aside class="siemola-sidebar w-full shrink-0 px-5 py-6 lg:sticky lg:top-0 lg:h-screen lg:w-[260px] lg:overflow-y-auto">
-                <div class="flex items-center gap-3 rounded-[22px] bg-white/5 px-4 py-4">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-900 shadow-lg shadow-slate-950/20">
+        <div class="siemola-layout">
+            <aside class="siemola-sidebar">
+                <div class="siemola-brand">
+                    <div class="siemola-brand-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-8 w-8">
                             <path d="M12 3 4 7v10l8 4 8-4V7l-8-4Z" />
                             <path d="M12 3v18M4 7l8 4 8-4M8 5l8 4" />
                         </svg>
                     </div>
                     <div>
-                        <p class="text-3xl font-extrabold tracking-tight text-white">SIEMOLA</p>
-                        <p class="text-sm text-slate-400">Smart Locker System</p>
+                        <p class="siemola-brand-title">SIEMOLA</p>
+                        <p class="siemola-brand-subtitle">Smart Locker System</p>
                     </div>
                 </div>
 
-                <nav class="mt-10 space-y-3">
+                <nav class="siemola-side-nav">
                     @foreach ($menu as $item)
                         @php
                             $isActive = ($activeMenu ?? '') === $item['label'];
@@ -67,51 +67,51 @@
 
             </aside>
 
-            <div class="flex-1 bg-[var(--siemola-surface)]">
-                <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 px-5 py-5 backdrop-blur sm:px-7 lg:px-10">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="siemola-main-shell">
+                <header class="siemola-topbar">
+                    <div class="siemola-topbar-inner">
                         <div>
-                            <h1 class="text-3xl font-extrabold tracking-tight text-slate-950">{{ $title ?? 'Dashboard' }}</h1>
+                            <h1 class="siemola-page-title">{{ $title ?? 'Dashboard' }}</h1>
                         </div>
 
-                        <div class="flex items-center justify-between gap-4 sm:justify-end">
+                        <div class="siemola-topbar-actions">
                             @if ($user?->role === 'staff')
-                                <x-dropdown align="right" width="80" contentClasses="rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+                                <x-dropdown align="right" width="80" contentClasses="siemola-dropdown-surface">
                                     <x-slot name="trigger">
-                                        <button type="button" class="relative flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+                                        <button type="button" class="siemola-icon-button">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6">
                                                 <path d="{{ $iconMap['bell'] }}" stroke-linecap="round" stroke-linejoin="round" />
                                             </svg>
                                             @if (($staffNotificationCount ?? 0) > 0)
-                                                <span class="absolute right-2 top-2 inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white"></span>
+                                                <span class="siemola-notification-dot"></span>
                                             @endif
                                         </button>
                                     </x-slot>
 
                                     <x-slot name="content">
-                                        <div class="w-80 p-2">
-                                            <div class="border-b border-slate-100 px-2 pb-3">
-                                                <p class="text-sm font-extrabold text-slate-950">Notifikasi Keterlambatan</p>
-                                                <p class="mt-1 text-xs font-medium text-slate-400">{{ ($staffNotificationCount ?? 0) > 0 ? ($staffNotificationCount.' transaksi terlambat') : 'Tidak ada keterlambatan aktif' }}</p>
+                                        <div class="siemola-notification-menu">
+                                            <div class="siemola-dropdown-header">
+                                                <p class="siemola-dropdown-title">Notifikasi Keterlambatan</p>
+                                                <p class="siemola-dropdown-muted">{{ ($staffNotificationCount ?? 0) > 0 ? ($staffNotificationCount.' transaksi terlambat') : 'Tidak ada keterlambatan aktif' }}</p>
                                             </div>
 
-                                            <div class="mt-2 space-y-1">
+                                            <div class="siemola-notification-list">
                                                 @forelse (($staffNotifications ?? collect()) as $notification)
-                                                    <a href="{{ route('history.index', ['search' => $notification->student?->name]) }}" class="block rounded-2xl px-3 py-3 transition hover:bg-amber-50">
-                                                        <p class="text-sm font-bold text-slate-900">{{ $notification->student?->name ?? 'Mahasiswa' }}</p>
-                                                        <p class="mt-1 text-xs leading-5 text-slate-500">
+                                                    <a href="{{ route('history.index', ['search' => $notification->student?->name]) }}" class="siemola-notification-item">
+                                                        <p class="siemola-notification-name">{{ $notification->student?->name ?? 'Mahasiswa' }}</p>
+                                                        <p class="siemola-notification-text">
                                                             {{ $notification->locker?->code ?? 'Loker' }} terlambat sejak {{ $notification->due_at?->format('d/m/Y H:i') ?? '-' }}.
                                                         </p>
                                                     </a>
                                                 @empty
-                                                    <div class="px-3 py-5 text-center text-sm font-medium text-slate-400">
+                                                    <div class="siemola-empty-message">
                                                         Semua peminjaman masih aman.
                                                     </div>
                                                 @endforelse
                                             </div>
 
                                             @if (($staffNotificationCount ?? 0) > 5)
-                                                <a href="{{ route('history.index') }}" class="mt-2 block rounded-2xl px-3 py-3 text-center text-sm font-bold text-blue-600 transition hover:bg-blue-50">Lihat semua histori</a>
+                                                <a href="{{ route('history.index') }}" class="siemola-dropdown-footer-link">Lihat semua histori</a>
                                             @endif
                                         </div>
                                     </x-slot>
@@ -119,17 +119,17 @@
                             @endif
 
                             @auth
-                                <x-dropdown align="right" width="64" contentClasses="rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+                                <x-dropdown align="right" width="64" contentClasses="siemola-dropdown-surface">
                                     <x-slot name="trigger">
-                                        <button type="button" class="flex items-center gap-3 rounded-full px-2 py-1 transition hover:bg-slate-50">
-                                            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-500/30">
+                                        <button type="button" class="siemola-user-trigger">
+                                            <div class="siemola-user-avatar">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6">
                                                     <path d="{{ $iconMap['user'] }}" stroke-linecap="round" stroke-linejoin="round" />
                                                 </svg>
                                             </div>
                                             <div class="text-left">
-                                                <p class="text-base font-bold text-slate-900">{{ $user->name }}</p>
-                                                <p class="text-sm font-medium text-slate-400">{{ $userRole ?? 'Admin' }}</p>
+                                                <p class="siemola-user-name">{{ $user->name }}</p>
+                                                <p class="siemola-user-role">{{ $userRole ?? 'Admin' }}</p>
                                             </div>
                                         </button>
                                     </x-slot>
@@ -137,11 +137,10 @@
                                     <x-slot name="content">
                                         <div class="space-y-1">
                                             <a href="{{ route('profile.edit') }}" class="siemola-dropdown-link">Profile</a>
-                                            <a href="{{ route('profile.edit') }}#password-section" class="siemola-dropdown-link">Ubah Password</a>
 
                                             <form method="POST" action="{{ route('logout') }}">
                                                 @csrf
-                                                <button type="submit" class="siemola-dropdown-link w-full text-left text-rose-500 hover:bg-rose-50">Logout</button>
+                                                <button type="submit" class="siemola-dropdown-link siemola-dropdown-danger">Logout</button>
                                             </form>
                                         </div>
                                     </x-slot>
@@ -150,9 +149,9 @@
 
                             @guest
                                 <div class="flex items-center gap-3">
-                                    <div class="hidden text-right sm:block">
-                                        <p class="text-base font-bold text-slate-900">Mahasiswa</p>
-                                        <p class="text-sm font-medium text-slate-400">Dashboard Publik</p>
+                                    <div class="siemola-guest-user">
+                                        <p class="siemola-user-name">Mahasiswa</p>
+                                        <p class="siemola-user-role">Dashboard Publik</p>
                                     </div>
 
                                     <a href="{{ route('login') }}" class="siemola-primary-button px-6 py-3">
@@ -164,9 +163,9 @@
                     </div>
                 </header>
 
-                <main class="px-5 py-6 sm:px-7 lg:px-10">
+                <main class="siemola-main-content">
                     @if (session('status'))
-                        <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                        <div class="siemola-flash">
                             {{ session('status') }}
                         </div>
                     @endif

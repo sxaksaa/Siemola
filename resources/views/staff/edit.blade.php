@@ -1,8 +1,8 @@
 <x-siemola-layout title="Edit Staff" active-menu="Data Staf" user-role="Admin" sidebar-note="Admin dapat memperbarui identitas, status, dan password akun staff dari halaman ini.">
     <section class="siemola-form-card">
-        <div class="mb-6">
-            <h2 class="text-2xl font-extrabold text-slate-950">Edit Data Staff</h2>
-            <p class="mt-1 text-sm font-medium text-slate-400">Perbarui detail staff yang bertugas mengelola operasional smart locker.</p>
+        <div class="siemola-form-intro">
+            <h2 class="siemola-form-title">Edit Data Staff</h2>
+            <p class="siemola-form-description">Perbarui detail staff yang bertugas mengelola operasional smart locker.</p>
         </div>
 
         <form method="POST" action="{{ route('staff.update', $staff) }}">

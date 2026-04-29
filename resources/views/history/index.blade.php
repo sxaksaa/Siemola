@@ -1,8 +1,8 @@
 @php
     $statusStyles = [
-        'borrowed' => 'bg-rose-500 text-white',
-        'returned' => 'bg-blue-500 text-white',
-        'late' => 'bg-amber-500 text-white',
+        'borrowed' => 'siemola-status-borrowed',
+        'returned' => 'siemola-status-returned',
+        'late' => 'siemola-status-late',
     ];
 
     $statusLabels = [
@@ -13,8 +13,8 @@
 @endphp
 
 <x-siemola-layout title="Histori Peminjaman" active-menu="Histori Peminjaman" user-role="Staf">
-    <section class="space-y-6">
-        <form id="history-filter-form" method="GET" action="{{ route('history.index') }}" class="space-y-6">
+    <section class="siemola-page-stack">
+        <form id="history-filter-form" method="GET" action="{{ route('history.index') }}" class="siemola-page-stack">
             <label class="siemola-search-shell xl:max-w-none">
                 <input
                     type="text"
@@ -29,15 +29,15 @@
                 </svg>
             </label>
 
-            <section class="rounded-[24px] bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.05)] ring-1 ring-slate-200/70 sm:p-6">
-                <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_240px] xl:items-end">
+            <section class="siemola-panel">
+                <div class="siemola-filter-grid">
                     <div>
                         <h2 class="text-xl font-extrabold text-slate-950">Batas Waktu</h2>
 
-                        <div class="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(260px,1fr)]">
+                        <div class="siemola-filter-fields">
                             <div>
                                 <label class="siemola-label">Tanggal</label>
-                                <div class="grid gap-3 sm:grid-cols-2">
+                                <div class="siemola-date-grid">
                                     <input type="date" name="start_date" value="{{ $filters['start_date'] }}" class="siemola-input" data-auto-filter="instant">
                                     <input type="date" name="end_date" value="{{ $filters['end_date'] }}" class="siemola-input" data-auto-filter="instant">
                                 </div>
@@ -62,11 +62,11 @@
             </section>
         </form>
 
-        <section class="overflow-hidden rounded-[24px] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.05)] ring-1 ring-slate-200/70">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
+        <section class="siemola-table-card-compact">
+            <div class="siemola-table-scroll">
+                <table class="siemola-table">
                     <thead>
-                        <tr class="border-b border-slate-200 bg-slate-50 text-slate-950">
+                        <tr class="siemola-table-head-muted">
                             <th class="siemola-th text-center">Tanggal</th>
                             <th class="siemola-th text-center">Jam Pinjam</th>
                             <th class="siemola-th text-center">Jam Kembali</th>
@@ -78,7 +78,7 @@
                     </thead>
                     <tbody>
                         @forelse ($borrowings as $borrowing)
-                            <tr class="border-b border-slate-100 last:border-b-0">
+                            <tr class="siemola-table-row">
                                 <td class="siemola-td text-center">{{ $borrowing->borrowed_at?->format('d/m/Y') }}</td>
                                 <td class="siemola-td text-center">{{ $borrowing->borrowed_at?->format('H:i') }}</td>
                                 <td class="siemola-td text-center">{{ $borrowing->returned_at?->format('H:i') ?? '-' }}</td>
@@ -86,14 +86,14 @@
                                 <td class="siemola-td text-center">{{ $borrowing->student?->study_program ?? '-' }}</td>
                                 <td class="siemola-td text-center">{{ $borrowing->locker?->code ?? '-' }}</td>
                                 <td class="siemola-td text-center">
-                                    <span class="inline-flex min-w-28 justify-center rounded-full px-4 py-2 text-sm font-bold {{ $statusStyles[$borrowing->status] ?? 'bg-slate-200 text-slate-600' }}">
+                                    <span class="siemola-status-pill {{ $statusStyles[$borrowing->status] ?? 'siemola-status-neutral' }}">
                                         {{ $statusLabels[$borrowing->status] ?? ucfirst($borrowing->status) }}
                                     </span>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-5 py-10 text-center text-sm font-medium text-slate-400">Belum ada histori peminjaman untuk filter ini.</td>
+                                <td colspan="7" class="siemola-table-empty">Belum ada histori peminjaman untuk filter ini.</td>
                             </tr>
                         @endforelse
                     </tbody>
