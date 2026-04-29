@@ -223,22 +223,28 @@
                             const currentTopbarActions = document.querySelector('.siemola-topbar-actions');
                             const nextTopbarActions = nextDocument.querySelector('.siemola-topbar-actions');
 
-                            if (currentMain && nextMain) {
-                                const scrollTop = window.scrollY;
-                                currentMain.innerHTML = nextMain.innerHTML;
-                                window.Alpine?.initTree(currentMain);
-                                window.scrollTo({ top: scrollTop });
-                            }
-
-                            if (currentTopbarActions && nextTopbarActions) {
-                                currentTopbarActions.innerHTML = nextTopbarActions.innerHTML;
-                                window.Alpine?.initTree(currentTopbarActions);
-                            }
+                            swapWhenChanged(currentMain, nextMain);
+                            swapWhenChanged(currentTopbarActions, nextTopbarActions);
                         } catch (error) {
                             console.debug('SIEMOLA auto refresh skipped:', error);
                         } finally {
                             inFlight = false;
                         }
+                    };
+
+                    const normalizeHtml = (element) => element?.innerHTML.trim() ?? '';
+
+                    const swapWhenChanged = (currentElement, nextElement) => {
+                        if (!currentElement || !nextElement) return;
+
+                        if (normalizeHtml(currentElement) === normalizeHtml(nextElement)) {
+                            return;
+                        }
+
+                        const scrollTop = window.scrollY;
+                        currentElement.replaceChildren(...Array.from(nextElement.childNodes).map((node) => node.cloneNode(true)));
+                        window.Alpine?.initTree(currentElement);
+                        window.scrollTo({ top: scrollTop });
                     };
 
                     const submitFilter = (form) => {
