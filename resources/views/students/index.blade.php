@@ -1,4 +1,4 @@
-<x-siemola-layout title="Data Mahasiswa" active-menu="Data Mahasiswa" user-role="Admin" sidebar-note="Admin mengelola data mahasiswa sebagai identitas peminjam dan UID RFID untuk akses locker.">
+<x-siemola-layout title="Data Mahasiswa" active-menu="Data Mahasiswa" user-role="Admin" sidebar-note="Admin mengelola data mahasiswa sebagai identitas peminjam dan UID RFID untuk akses locker." :auto-refresh="true">
     <section class="siemola-page-stack">
         <div class="siemola-toolbar">
             <form method="GET" action="{{ route('students.index') }}" class="siemola-toolbar-search">

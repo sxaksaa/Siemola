@@ -22,6 +22,7 @@ class HistoryController extends Controller
                 ->withQueryString(),
             'studyPrograms' => $this->studyPrograms(),
             'filters' => $filters,
+            'displayTimezone' => $this->displayTimezone(),
         ]);
     }
 
@@ -34,6 +35,7 @@ class HistoryController extends Controller
                 ->oldest('borrowed_at')
                 ->get(),
             'filters' => $filters,
+            'displayTimezone' => $this->displayTimezone(),
         ]);
     }
 
@@ -69,19 +71,20 @@ class HistoryController extends Controller
 
     private function filters(Request $request): array
     {
-        $today = now()->toDateString();
+        $timezone = $this->displayTimezone();
+        $today = now($timezone)->toDateString();
         $startDate = $this->dateValue($request->query('start_date'), $today);
-        $endDate = $this->dateValue($request->query('end_date'), now()->addDay()->toDateString());
+        $endDate = $this->dateValue($request->query('end_date'), now($timezone)->addDay()->toDateString());
 
-        if (Carbon::parse($endDate)->lessThanOrEqualTo(Carbon::parse($startDate))) {
-            $endDate = Carbon::parse($startDate)->addDay()->toDateString();
+        if (Carbon::parse($endDate, $timezone)->lessThanOrEqualTo(Carbon::parse($startDate, $timezone))) {
+            $endDate = Carbon::parse($startDate, $timezone)->addDay()->toDateString();
         }
 
         return [
             'start_date' => $startDate,
             'end_date' => $endDate,
-            'start_at' => Carbon::parse($startDate)->startOfDay(),
-            'end_at' => Carbon::parse($endDate)->startOfDay(),
+            'start_at' => Carbon::parse($startDate, $timezone)->startOfDay()->utc(),
+            'end_at' => Carbon::parse($endDate, $timezone)->startOfDay()->utc(),
             'study_program' => trim((string) $request->query('study_program', '')),
             'search' => trim((string) $request->query('search', '')),
         ];
@@ -108,5 +111,10 @@ class HistoryController extends Controller
             ->distinct()
             ->orderBy('study_program')
             ->pluck('study_program');
+    }
+
+    private function displayTimezone(): string
+    {
+        return config('app.display_timezone', 'Asia/Jakarta');
     }
 }

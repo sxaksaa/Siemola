@@ -12,7 +12,7 @@
     ];
 @endphp
 
-<x-siemola-layout title="Histori Peminjaman" active-menu="Histori Peminjaman" user-role="Staf">
+<x-siemola-layout title="Histori Peminjaman" active-menu="Histori Peminjaman" user-role="Staf" :auto-refresh="true">
     <section class="siemola-page-stack">
         <form id="history-filter-form" method="GET" action="{{ route('history.index') }}" class="siemola-page-stack">
             <label class="siemola-search-shell xl:max-w-none">
@@ -78,10 +78,14 @@
                     </thead>
                     <tbody>
                         @forelse ($borrowings as $borrowing)
+                            @php
+                                $borrowedAt = $borrowing->borrowed_at?->copy()->timezone($displayTimezone);
+                                $returnedAt = $borrowing->returned_at?->copy()->timezone($displayTimezone);
+                            @endphp
                             <tr class="siemola-table-row">
-                                <td class="siemola-td text-center">{{ $borrowing->borrowed_at?->format('d/m/Y') }}</td>
-                                <td class="siemola-td text-center">{{ $borrowing->borrowed_at?->format('H:i') }}</td>
-                                <td class="siemola-td text-center">{{ $borrowing->returned_at?->format('H:i') ?? '-' }}</td>
+                                <td class="siemola-td text-center">{{ $borrowedAt?->format('d/m/Y') }}</td>
+                                <td class="siemola-td text-center">{{ $borrowedAt?->format('H:i') }}</td>
+                                <td class="siemola-td text-center">{{ $returnedAt?->format('H:i') ?? '-' }}</td>
                                 <td class="siemola-td text-center">{{ $borrowing->student?->name ?? '-' }}</td>
                                 <td class="siemola-td text-center">{{ $borrowing->student?->study_program ?? '-' }}</td>
                                 <td class="siemola-td text-center">{{ $borrowing->locker?->code ?? '-' }}</td>
@@ -106,36 +110,4 @@
         </div>
     </section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('history-filter-form');
-            const exportLink = document.getElementById('history-export-link');
-            let timer;
-
-            const submitFilter = () => {
-                if (form.requestSubmit) {
-                    form.requestSubmit();
-                    return;
-                }
-
-                form.submit();
-            };
-
-            form.querySelectorAll('[data-auto-filter="instant"]').forEach((input) => {
-                input.addEventListener('change', submitFilter);
-            });
-
-            form.querySelectorAll('[data-auto-filter="debounced"]').forEach((input) => {
-                input.addEventListener('input', () => {
-                    clearTimeout(timer);
-                    timer = setTimeout(submitFilter, 500);
-                });
-            });
-
-            exportLink.addEventListener('click', () => {
-                const params = new URLSearchParams(new FormData(form));
-                exportLink.href = `${exportLink.dataset.baseUrl}?${params.toString()}`;
-            });
-        });
-    </script>
 </x-siemola-layout>

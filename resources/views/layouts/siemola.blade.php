@@ -25,6 +25,7 @@
             ];
 
             $user = auth()->user();
+            $displayTimezone = config('app.display_timezone', 'Asia/Jakarta');
             $menu = collect([
                 ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'dashboard', 'roles' => ['guest', 'staff', 'admin']],
                 ['label' => 'Histori Peminjaman', 'route' => 'history.index', 'icon' => 'history', 'roles' => ['staff']],
@@ -100,7 +101,7 @@
                                                     <a href="{{ route('history.index', ['search' => $notification->student?->name]) }}" class="siemola-notification-item">
                                                         <p class="siemola-notification-name">{{ $notification->student?->name ?? 'Mahasiswa' }}</p>
                                                         <p class="siemola-notification-text">
-                                                            {{ $notification->locker?->code ?? 'Loker' }} terlambat sejak {{ $notification->due_at?->format('d/m/Y H:i') ?? '-' }}.
+                                                            {{ $notification->locker?->code ?? 'Loker' }} terlambat sejak {{ $notification->due_at?->copy()->timezone($displayTimezone)->format('d/m/Y H:i') ?? '-' }}.
                                                         </p>
                                                     </a>
                                                 @empty
@@ -163,7 +164,7 @@
                     </div>
                 </header>
 
-                <main class="siemola-main-content">
+                <main class="siemola-main-content" data-siemola-refresh-target="main">
                     @if (session('status'))
                         <div class="siemola-flash">
                             {{ session('status') }}
@@ -174,5 +175,115 @@
                 </main>
             </div>
         </div>
+
+        @if ($autoRefresh)
+            <script>
+                (() => {
+                    const interval = Number(@json($autoRefreshInterval));
+                    const refreshTargetSelector = '[data-siemola-refresh-target="main"]';
+                    let inFlight = false;
+                    let filterTimer = null;
+
+                    const isInteractiveElement = (element) => {
+                        if (!element) return false;
+
+                        return ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(element.tagName)
+                            || element.isContentEditable
+                            || Boolean(element.closest('form'));
+                    };
+
+                    const shouldPauseRefresh = () => {
+                        if (document.hidden || inFlight) return true;
+
+                        const activeElement = document.activeElement;
+
+                        return isInteractiveElement(activeElement);
+                    };
+
+                    const refreshPage = async () => {
+                        if (shouldPauseRefresh()) return;
+
+                        inFlight = true;
+
+                        try {
+                            const response = await fetch(window.location.href, {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-SIEMOLA-AUTO-REFRESH': '1',
+                                },
+                                credentials: 'same-origin',
+                            });
+
+                            if (!response.ok || response.redirected) return;
+
+                            const html = await response.text();
+                            const nextDocument = new DOMParser().parseFromString(html, 'text/html');
+                            const currentMain = document.querySelector(refreshTargetSelector);
+                            const nextMain = nextDocument.querySelector(refreshTargetSelector);
+                            const currentTopbarActions = document.querySelector('.siemola-topbar-actions');
+                            const nextTopbarActions = nextDocument.querySelector('.siemola-topbar-actions');
+
+                            if (currentMain && nextMain) {
+                                const scrollTop = window.scrollY;
+                                currentMain.innerHTML = nextMain.innerHTML;
+                                window.Alpine?.initTree(currentMain);
+                                window.scrollTo({ top: scrollTop });
+                            }
+
+                            if (currentTopbarActions && nextTopbarActions) {
+                                currentTopbarActions.innerHTML = nextTopbarActions.innerHTML;
+                                window.Alpine?.initTree(currentTopbarActions);
+                            }
+                        } catch (error) {
+                            console.debug('SIEMOLA auto refresh skipped:', error);
+                        } finally {
+                            inFlight = false;
+                        }
+                    };
+
+                    const submitFilter = (form) => {
+                        if (!form) return;
+
+                        if (form.requestSubmit) {
+                            form.requestSubmit();
+                            return;
+                        }
+
+                        form.submit();
+                    };
+
+                    document.addEventListener('change', (event) => {
+                        const field = event.target.closest('#history-filter-form [data-auto-filter="instant"]');
+
+                        if (field) {
+                            submitFilter(field.form);
+                        }
+                    });
+
+                    document.addEventListener('input', (event) => {
+                        const field = event.target.closest('#history-filter-form [data-auto-filter="debounced"]');
+
+                        if (!field) return;
+
+                        clearTimeout(filterTimer);
+                        filterTimer = setTimeout(() => submitFilter(field.form), 500);
+                    });
+
+                    document.addEventListener('click', (event) => {
+                        const exportLink = event.target.closest('#history-export-link');
+
+                        if (!exportLink) return;
+
+                        const form = document.getElementById('history-filter-form');
+                        if (!form) return;
+
+                        const params = new URLSearchParams(new FormData(form));
+                        exportLink.href = `${exportLink.dataset.baseUrl}?${params.toString()}`;
+                    });
+
+                    window.setInterval(refreshPage, Math.max(interval, 3000));
+                })();
+            </script>
+        @endif
     </body>
 </html>

@@ -38,8 +38,9 @@ function simulateBorrow(string $baseUrl, string $deviceId, string $uid): bool
 
     $current = readLockerStatus($baseUrl, $deviceId);
 
-    if (($current['locker_status'] ?? null) !== 'available') {
+    if ((bool) ($current['has_active_borrowing'] ?? false)) {
         writeln(PHP_EOL.'Loker belum tersedia, jadi simulator tidak mengubah nilai switch.');
+        writeln('Masih ada peminjaman aktif oleh '.($current['active_borrower'] ?? 'mahasiswa lain').'.');
         writeln('Simulator hanya mengirim tap RFID seperti orang mencoba akses loker yang masih dipinjam.');
         sendTap($baseUrl, $deviceId, $uid, false);
 
@@ -67,6 +68,16 @@ function simulateCycle(string $baseUrl, string $deviceId, string $uid): bool
 function simulateReturn(string $baseUrl, string $deviceId, string $uid): bool
 {
     writeln('Simulasi kembali: locker kosong, RFID tap, lalu barang masuk lagi.');
+    $current = readLockerStatus($baseUrl, $deviceId);
+
+    if (! (bool) ($current['has_active_borrowing'] ?? false)) {
+        writeln(PHP_EOL.'Belum ada peminjaman aktif, jadi simulator hanya mengirim tap return yang akan ditolak.');
+        sendSensorStatus($baseUrl, $deviceId, 1);
+        sendTap($baseUrl, $deviceId, $uid, false);
+
+        return true;
+    }
+
     sendSensorStatus($baseUrl, $deviceId, 1);
     sendTap($baseUrl, $deviceId, $uid);
     sendSensorStatus($baseUrl, $deviceId, 0);

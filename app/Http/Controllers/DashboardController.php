@@ -13,7 +13,8 @@ class DashboardController extends Controller
 {
     public function __invoke(): View
     {
-        app(BorrowingStatusService::class)->syncLateStatuses();
+        $borrowingStatusService = app(BorrowingStatusService::class);
+        $borrowingStatusService->syncLateStatuses();
 
         $iconMap = [
             'staff' => 'M5 18h14M6 18v-1a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v1M12 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 4a3 3 0 0 0-3 3v1m18-1v-1a3 3 0 0 0-3-3m-1-7a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z',
@@ -85,7 +86,7 @@ class DashboardController extends Controller
         $lockerStatusSummary = collect([
             ['label' => 'Tersedia', 'value' => Locker::query()->where('status', 'available')->count(), 'tone' => 'text-emerald-600 bg-emerald-50 ring-emerald-100'],
             ['label' => 'Sedang dipinjam', 'value' => Locker::query()->where('status', 'borrowed')->count(), 'tone' => 'text-rose-600 bg-rose-50 ring-rose-100'],
-            ['label' => 'Telat Mengembalikan', 'value' => Locker::query()->where('status', 'late')->count(), 'tone' => 'text-amber-600 bg-amber-50 ring-amber-100'],
+            ['label' => 'Telat Mengembalikan', 'value' => $borrowingStatusService->activeLateQuery()->count(), 'tone' => 'text-amber-600 bg-amber-50 ring-amber-100'],
         ]);
 
         return view('dashboard', [

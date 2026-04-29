@@ -13,6 +13,8 @@ class SiemolaLayout extends Component
         public string $activeMenu = 'Dashboard',
         public string $userRole = 'Admin',
         public string $sidebarNote = 'SIEMOLA dipakai untuk menghubungkan RFID, locker, dan riwayat peminjaman alat kampus.',
+        public bool $autoRefresh = false,
+        public int $autoRefreshInterval = 5000,
     ) {
     }
 

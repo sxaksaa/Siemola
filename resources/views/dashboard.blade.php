@@ -1,4 +1,4 @@
-<x-siemola-layout title="Dashboard" active-menu="Dashboard" user-role="{{ auth()->check() ? ucfirst(auth()->user()->role) : 'Mahasiswa' }}" sidebar-note="Dashboard ini nanti bisa menampilkan data real dari tabel mahasiswa, locker, alat, dan transaksi peminjaman.">
+<x-siemola-layout title="Dashboard" active-menu="Dashboard" user-role="{{ auth()->check() ? ucfirst(auth()->user()->role) : 'Mahasiswa' }}" sidebar-note="Dashboard ini nanti bisa menampilkan data real dari tabel mahasiswa, locker, alat, dan transaksi peminjaman." :auto-refresh="true">
     @php
         $accentClasses = [
             'violet' => 'siemola-accent-violet',

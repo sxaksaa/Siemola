@@ -104,10 +104,14 @@
             </thead>
             <tbody>
                 @forelse ($borrowings as $borrowing)
+                    @php
+                        $borrowedAt = $borrowing->borrowed_at?->copy()->timezone($displayTimezone);
+                        $returnedAt = $borrowing->returned_at?->copy()->timezone($displayTimezone);
+                    @endphp
                     <tr>
-                        <td>{{ $borrowing->borrowed_at?->format('d/m/Y') }}</td>
-                        <td>{{ $borrowing->borrowed_at?->format('H:i') }}</td>
-                        <td>{{ $borrowing->returned_at?->format('H:i') ?? '-' }}</td>
+                        <td>{{ $borrowedAt?->format('d/m/Y') }}</td>
+                        <td>{{ $borrowedAt?->format('H:i') }}</td>
+                        <td>{{ $returnedAt?->format('H:i') ?? '-' }}</td>
                         <td>{{ $borrowing->student?->name ?? '-' }}</td>
                         <td>{{ $borrowing->student?->study_program ?? '-' }}</td>
                         <td>{{ $borrowing->locker?->code ?? '-' }}</td>

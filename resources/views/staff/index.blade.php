@@ -1,4 +1,4 @@
-<x-siemola-layout title="Data Staf" active-menu="Data Staf" user-role="Admin" sidebar-note="Admin mengelola akun staff yang bertugas memonitor dashboard operasional.">
+<x-siemola-layout title="Data Staf" active-menu="Data Staf" user-role="Admin" sidebar-note="Admin mengelola akun staff yang bertugas memonitor dashboard operasional." :auto-refresh="true">
     <section class="siemola-page-stack">
         <div class="siemola-toolbar">
             <form method="GET" action="{{ route('staff.index') }}" class="siemola-toolbar-search">

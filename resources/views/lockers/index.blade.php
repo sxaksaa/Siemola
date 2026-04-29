@@ -1,4 +1,4 @@
-<x-siemola-layout title="Data Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin mengelola identitas loker dan memantau status dari switch ESP.">
+<x-siemola-layout title="Data Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin mengelola identitas loker dan memantau status dari switch ESP." :auto-refresh="true">
     <section class="siemola-page-stack">
         <div class="siemola-toolbar">
             <form method="GET" action="{{ route('lockers.index') }}" class="siemola-toolbar-search">

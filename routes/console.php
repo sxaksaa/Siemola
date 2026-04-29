@@ -14,4 +14,6 @@ Artisan::command('borrowings:sync-late', function () {
     $this->info("Synced {$count} late borrowing(s).");
 })->purpose('Mark overdue borrowings and lockers as late');
 
-Schedule::command('borrowings:sync-late')->dailyAt('17:00');
+Schedule::command('borrowings:sync-late')
+    ->dailyAt('17:00')
+    ->timezone(config('app.display_timezone', 'Asia/Jakarta'));

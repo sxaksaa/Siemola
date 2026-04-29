@@ -50,12 +50,7 @@ class EspLockerController extends Controller
                 ];
             }
 
-            $activeBorrowing = Borrowing::query()
-                ->where('locker_id', $locker->id)
-                ->whereNull('returned_at')
-                ->latest('borrowed_at')
-                ->lockForUpdate()
-                ->first();
+            $activeBorrowing = $this->activeBorrowingForLocker($locker, true);
 
             if ($locker->switch_state === null) {
                 return $this->tapFromBorrowingState($student, $rfidCard, $locker, $activeBorrowing);
@@ -124,6 +119,8 @@ class EspLockerController extends Controller
             $locker = $locker->fresh();
         }
 
+        $activeBorrowing = $this->activeBorrowingForLocker($locker);
+
         return response()->json([
             'status' => $this->arduinoStatusCode($locker->status),
             'locker_status' => $locker->status,
@@ -131,6 +128,8 @@ class EspLockerController extends Controller
             'locstatus' => $locker->switch_state,
             'switch_state' => $locker->switch_state,
             'switch_label' => $this->switchStateLabel($locker->switch_state),
+            'has_active_borrowing' => $activeBorrowing !== null,
+            'active_borrower' => $activeBorrowing?->student?->name,
             'message' => match ($locker->status) {
                 'borrowed' => 'Loker sedang dipinjam.',
                 'late' => 'Peminjaman loker sudah telat.',
@@ -178,6 +177,21 @@ class EspLockerController extends Controller
             'locker_id' => $locker->id,
             'accessed_at' => now(),
         ]);
+    }
+
+    private function activeBorrowingForLocker(Locker $locker, bool $lock = false): ?Borrowing
+    {
+        $query = Borrowing::query()
+            ->with('student')
+            ->where('locker_id', $locker->id)
+            ->whereNull('returned_at')
+            ->latest('borrowed_at');
+
+        if ($lock) {
+            $query->lockForUpdate();
+        }
+
+        return $query->first();
     }
 
     private function tapFromBorrowingState(
@@ -307,14 +321,15 @@ class EspLockerController extends Controller
 
     private function nextDueAt()
     {
-        $now = now();
+        $timezone = config('app.display_timezone', 'Asia/Jakarta');
+        $now = now($timezone);
         $dueAt = $now->copy()->setTime(17, 0);
 
         if ($dueAt->lessThanOrEqualTo($now)) {
             $dueAt->addDay();
         }
 
-        return $dueAt;
+        return $dueAt->utc();
     }
 
     private function arduinoStatusCode(string $status): int
