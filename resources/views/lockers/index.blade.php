@@ -1,4 +1,4 @@
-<x-siemola-layout title="Data Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin mengelola identitas loker, device ID, dan status operasional locker.">
+<x-siemola-layout title="Data Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin mengelola identitas loker dan memantau status dari switch ESP.">
     <section class="siemola-page-stack">
         <div class="siemola-toolbar">
             <form method="GET" action="{{ route('lockers.index') }}" class="siemola-toolbar-search">
@@ -26,6 +26,7 @@
                             <th class="siemola-th">Kode Loker</th>
                             <th class="siemola-th">Nama</th>
                             <th class="siemola-th">Device ID</th>
+                            <th class="siemola-th">Sensor Switch</th>
                             <th class="siemola-th">Status</th>
                             <th class="siemola-th text-center">Aksi</th>
                         </tr>
@@ -36,6 +37,19 @@
                                 <td class="siemola-td font-medium text-slate-800">{{ $locker->code }}</td>
                                 <td class="siemola-td">{{ $locker->name }}</td>
                                 <td class="siemola-td">{{ $locker->device_id ?: '-' }}</td>
+                                <td class="siemola-td">
+                                    <span class="siemola-badge {{ match($locker->switch_state) {
+                                        1 => 'siemola-badge-active',
+                                        0 => 'siemola-badge-borrowed',
+                                        default => 'siemola-badge-inactive',
+                                    } }}">
+                                        {{ match($locker->switch_state) {
+                                            1 => 'Ada barang',
+                                            0 => 'Kosong',
+                                            default => 'Belum sinkron',
+                                        } }}
+                                    </span>
+                                </td>
                                 <td class="siemola-td">
                                     <span class="siemola-badge {{ match($locker->status) {
                                         'available' => 'siemola-badge-active',
@@ -73,7 +87,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="siemola-table-empty">Belum ada data loker yang cocok dengan pencarian.</td>
+                                <td colspan="6" class="siemola-table-empty">Belum ada data loker yang cocok dengan pencarian.</td>
                             </tr>
                         @endforelse
                     </tbody>

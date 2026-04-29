@@ -345,6 +345,18 @@
         @apply mt-4 text-sm text-slate-400;
     }
 
+    .siemola-sensor-note {
+        @apply rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3;
+    }
+
+    .siemola-sensor-note-title {
+        @apply block text-sm font-extrabold text-slate-900;
+    }
+
+    .siemola-sensor-note-text {
+        @apply mt-1 block text-sm font-medium leading-6 text-slate-500;
+    }
+
     .siemola-filter-grid {
         @apply grid gap-5 xl:grid-cols-[minmax(0,1fr)_240px] xl:items-end;
     }

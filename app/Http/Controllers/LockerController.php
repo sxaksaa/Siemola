@@ -21,7 +21,8 @@ class LockerController extends Controller
                         ->where('code', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%")
                         ->orWhere('device_id', 'like', "%{$search}%")
-                        ->orWhere('status', 'like', "%{$search}%");
+                        ->orWhere('status', 'like', "%{$search}%")
+                        ->orWhere('switch_state', 'like', "%{$search}%");
                 });
             })
             ->orderByRaw('LENGTH(code), code')
@@ -46,7 +47,10 @@ class LockerController extends Controller
         $validated = $request->validate($this->rules());
 
         $validated['location'] = null;
+        $validated['status'] = 'available';
         $validated['last_ping_at'] = null;
+        $validated['switch_state'] = null;
+        $validated['switch_reported_at'] = null;
 
         Locker::create($validated);
 
@@ -67,7 +71,6 @@ class LockerController extends Controller
         $validated = $request->validate($this->rules($locker->id));
 
         $validated['location'] = null;
-        $validated['last_ping_at'] = null;
 
         $locker->update($validated);
 
@@ -101,7 +104,6 @@ class LockerController extends Controller
                 'max:100',
                 Rule::unique('lockers', 'device_id')->ignore($lockerId),
             ],
-            'status' => ['required', 'in:available,borrowed,late'],
         ];
     }
 }

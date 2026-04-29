@@ -2,7 +2,7 @@
     <section class="siemola-form-card">
         <div class="siemola-form-intro">
             <h2 class="siemola-form-title">Tambah Data Loker</h2>
-            <p class="siemola-form-description">Lengkapi kode, nama, device ID, dan status loker.</p>
+            <p class="siemola-form-description">Lengkapi kode, nama, dan device ID loker.</p>
         </div>
 
         <form method="POST" action="{{ route('lockers.store') }}">

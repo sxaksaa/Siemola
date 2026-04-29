@@ -57,62 +57,13 @@ class EspLockerController extends Controller
                 ->lockForUpdate()
                 ->first();
 
-            if ($activeBorrowing) {
-                if ((int) $activeBorrowing->student_id !== (int) $student->id) {
-                    return [
-                        'ok' => false,
-                        'message' => 'Loker sedang dipakai mahasiswa lain.',
-                    ];
-                }
-
-                $this->recordLockerAccess($student, $rfidCard, $locker);
-
-                $activeBorrowing->update([
-                    'returned_at' => now(),
-                    'status' => 'returned',
-                ]);
-
-                $locker->update([
-                    'status' => 'available',
-                    'last_ping_at' => now(),
-                ]);
-
-                $student->update(['last_tapped_at' => now()]);
-
-                return [
-                    'ok' => true,
-                    'action' => 'returned',
-                    'locker' => $locker->fresh(),
-                ];
+            if ($locker->switch_state === null) {
+                return $this->tapFromBorrowingState($student, $rfidCard, $locker, $activeBorrowing);
             }
 
-            if ($locker->status !== 'available') {
-                $locker->update(['status' => 'available']);
-            }
-
-            $this->recordLockerAccess($student, $rfidCard, $locker);
-
-            Borrowing::query()->create([
-                'student_id' => $student->id,
-                'locker_id' => $locker->id,
-                'borrowed_rfid_uid' => $rfidCard->uid,
-                'borrowed_at' => now(),
-                'due_at' => $this->nextDueAt(),
-                'status' => 'borrowed',
-            ]);
-
-            $locker->update([
-                'status' => 'borrowed',
-                'last_ping_at' => now(),
-            ]);
-
-            $student->update(['last_tapped_at' => now()]);
-
-            return [
-                'ok' => true,
-                'action' => 'borrowed',
-                'locker' => $locker->fresh(),
-            ];
+            return (int) $locker->switch_state === 1
+                ? $this->borrowLocker($student, $rfidCard, $locker, $activeBorrowing)
+                : $this->returnLocker($student, $rfidCard, $locker, $activeBorrowing);
         });
 
         if (! $result['ok']) {
@@ -126,9 +77,9 @@ class EspLockerController extends Controller
             'locker' => $result['locker']->code,
             'locker_status' => $result['locker']->status,
             'locker_status_code' => $this->arduinoStatusCode($result['locker']->status),
-            'message' => $result['action'] === 'returned'
-                ? 'Pengembalian berhasil.'
-                : 'Peminjaman berhasil.',
+            'switch_state' => $result['locker']->switch_state,
+            'switch_label' => $this->switchStateLabel($result['locker']->switch_state),
+            'message' => $result['message'],
         ]);
     }
 
@@ -136,7 +87,7 @@ class EspLockerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'device_id' => ['required', 'string', 'max:100'],
-            'locstatus' => ['nullable', 'integer'],
+            'locstatus' => ['nullable', 'integer', 'in:0,1'],
         ]);
 
         if ($validator->fails()) {
@@ -157,13 +108,29 @@ class EspLockerController extends Controller
             ], 404);
         }
 
-        $locker->update(['last_ping_at' => now()]);
+        $update = [];
+
+        if (array_key_exists('locstatus', $validated) && $validated['locstatus'] !== null) {
+            $switchState = (int) $validated['locstatus'];
+
+            $update['last_ping_at'] = now();
+            $update['switch_state'] = $switchState;
+            $update['switch_reported_at'] = now();
+            $update['status'] = $this->operationalStatusFromSwitchState($locker, $switchState);
+        }
+
+        if ($update !== []) {
+            $locker->update($update);
+            $locker = $locker->fresh();
+        }
 
         return response()->json([
             'status' => $this->arduinoStatusCode($locker->status),
             'locker_status' => $locker->status,
             'locker' => $locker->code,
-            'locstatus' => $validated['locstatus'] ?? null,
+            'locstatus' => $locker->switch_state,
+            'switch_state' => $locker->switch_state,
+            'switch_label' => $this->switchStateLabel($locker->switch_state),
             'message' => match ($locker->status) {
                 'borrowed' => 'Loker sedang dipinjam.',
                 'late' => 'Peminjaman loker sudah telat.',
@@ -211,6 +178,100 @@ class EspLockerController extends Controller
             'locker_id' => $locker->id,
             'accessed_at' => now(),
         ]);
+    }
+
+    private function tapFromBorrowingState(
+        Student $student,
+        RfidCard $rfidCard,
+        Locker $locker,
+        ?Borrowing $activeBorrowing
+    ): array {
+        return $activeBorrowing
+            ? $this->returnLocker($student, $rfidCard, $locker, $activeBorrowing)
+            : $this->borrowLocker($student, $rfidCard, $locker, $activeBorrowing);
+    }
+
+    private function borrowLocker(
+        Student $student,
+        RfidCard $rfidCard,
+        Locker $locker,
+        ?Borrowing $activeBorrowing
+    ): array {
+        if ($activeBorrowing) {
+            return [
+                'ok' => false,
+                'message' => (int) $activeBorrowing->student_id === (int) $student->id
+                    ? 'Mahasiswa ini masih tercatat meminjam loker.'
+                    : 'Loker sedang dipakai mahasiswa lain.',
+            ];
+        }
+
+        $this->recordLockerAccess($student, $rfidCard, $locker);
+
+        Borrowing::query()->create([
+            'student_id' => $student->id,
+            'locker_id' => $locker->id,
+            'borrowed_rfid_uid' => $rfidCard->uid,
+            'borrowed_at' => now(),
+            'due_at' => $this->nextDueAt(),
+            'status' => 'borrowed',
+        ]);
+
+        $locker->update([
+            'status' => 'borrowed',
+            'last_ping_at' => now(),
+        ]);
+
+        $student->update(['last_tapped_at' => now()]);
+
+        return [
+            'ok' => true,
+            'action' => 'borrowed',
+            'locker' => $locker->fresh(),
+            'message' => 'Peminjaman berhasil.',
+        ];
+    }
+
+    private function returnLocker(
+        Student $student,
+        RfidCard $rfidCard,
+        Locker $locker,
+        ?Borrowing $activeBorrowing
+    ): array {
+        if (! $activeBorrowing) {
+            return [
+                'ok' => false,
+                'message' => 'Tidak ada peminjaman aktif untuk dikembalikan.',
+            ];
+        }
+
+        if ((int) $activeBorrowing->student_id !== (int) $student->id) {
+            return [
+                'ok' => false,
+                'message' => 'Loker sedang dipakai mahasiswa lain.',
+            ];
+        }
+
+        $this->recordLockerAccess($student, $rfidCard, $locker);
+
+        $activeBorrowing->update([
+            'returned_at' => now(),
+            'status' => 'returned',
+        ]);
+
+        $locker->update([
+            'status' => 'available',
+            'last_ping_at' => now(),
+        ]);
+
+        $student->update(['last_tapped_at' => now()]);
+
+        return [
+            'ok' => true,
+            'action' => 'returned',
+            'locker' => $locker->fresh(),
+            'message' => 'Pengembalian berhasil.',
+        ];
     }
 
     private function findLockerByDeviceId(string $deviceId, bool $lock = false): ?Locker
@@ -261,6 +322,35 @@ class EspLockerController extends Controller
     private function arduinoStatusCode(string $status): int
     {
         return $status === 'available' ? 0 : 1;
+    }
+
+    private function statusFromSwitchState(int $switchState): string
+    {
+        return $switchState === 1 ? 'available' : 'borrowed';
+    }
+
+    private function operationalStatusFromSwitchState(Locker $locker, int $switchState): string
+    {
+        $activeBorrowing = Borrowing::query()
+            ->where('locker_id', $locker->id)
+            ->whereNull('returned_at')
+            ->latest('borrowed_at')
+            ->first();
+
+        if ($activeBorrowing) {
+            return $activeBorrowing->status === 'late' ? 'late' : 'borrowed';
+        }
+
+        return $this->statusFromSwitchState($switchState);
+    }
+
+    private function switchStateLabel(?int $switchState): string
+    {
+        return match ($switchState) {
+            1 => 'Ada barang',
+            0 => 'Kosong',
+            default => 'Belum sinkron',
+        };
     }
 
     private function denied(string $message): JsonResponse

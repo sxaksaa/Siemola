@@ -1,4 +1,4 @@
-<x-siemola-layout title="Edit Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin dapat mengubah device ID dan status locker agar sinkron dengan kondisi perangkat nyata.">
+<x-siemola-layout title="Edit Loker" active-menu="Data Loker" user-role="Admin" sidebar-note="Admin dapat mengubah identitas locker, sedangkan status mengikuti switch ESP.">
     <section class="siemola-form-card">
         <div class="siemola-form-intro">
             <h2 class="siemola-form-title">Edit Data Loker</h2>

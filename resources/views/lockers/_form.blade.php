@@ -23,20 +23,9 @@
         @enderror
     </div>
 
-    <div>
-        <label for="status" class="siemola-label">Status</label>
-        <select id="status" name="status" class="siemola-input" required>
-            @foreach ([
-                'available' => 'Tersedia',
-                'borrowed' => 'Sedang dipinjam',
-                'late' => 'Telat Mengembalikan',
-            ] as $value => $label)
-                <option value="{{ $value }}" @selected(old('status', $locker->status ?: 'available') === $value)>{{ $label }}</option>
-            @endforeach
-        </select>
-        @error('status')
-            <p class="siemola-error">{{ $message }}</p>
-        @enderror
+    <div class="siemola-sensor-note">
+        <span class="siemola-sensor-note-title">Status mengikuti switch ESP</span>
+        <span class="siemola-sensor-note-text">1 = ada barang / tersedia, 0 = kosong / sedang dipinjam.</span>
     </div>
 </div>
 

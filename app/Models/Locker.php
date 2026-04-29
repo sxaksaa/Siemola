@@ -17,12 +17,16 @@ class Locker extends Model
         'device_id',
         'status',
         'last_ping_at',
+        'switch_state',
+        'switch_reported_at',
     ];
 
     protected function casts(): array
     {
         return [
             'last_ping_at' => 'datetime',
+            'switch_state' => 'integer',
+            'switch_reported_at' => 'datetime',
         ];
     }
 
