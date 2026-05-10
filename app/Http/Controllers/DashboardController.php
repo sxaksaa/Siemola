@@ -13,7 +13,7 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View
+/*  */    public function __invoke(): View
     {
         $borrowingStatusService = app(BorrowingStatusService::class);
         $borrowingStatusService->syncLateStatuses();

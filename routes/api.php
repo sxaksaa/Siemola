@@ -1,53 +1,53 @@
 <?php
 
 use App\Http\Controllers\Api\EspLockerController;
-use App\Http\Controllers\flutter\flutterAuthController;
-use App\Http\Controllers\flutter\flutterDashboardController;
-use App\Http\Controllers\flutter\historyController;
-use App\Http\Controllers\flutter\lockerController;
-use App\Http\Controllers\flutter\mahasiswaController;
-use App\Http\Controllers\flutter\notificationController;
-use App\Http\Controllers\flutter\profileController;
-use App\Http\Controllers\flutter\staffController;
+use App\Http\Controllers\flutter\FlutterAuthController;
+use App\Http\Controllers\flutter\FlutterDashboardController;
+use App\Http\Controllers\flutter\HistoryController;
+use App\Http\Controllers\flutter\LockerController;
+use App\Http\Controllers\flutter\MahasiswaController;
+use App\Http\Controllers\flutter\NotificationController;
+use App\Http\Controllers\flutter\ProfileController;
+use App\Http\Controllers\flutter\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/tab', [EspLockerController::class, 'tap']);
 Route::post('/getStatus', [EspLockerController::class, 'status']);
 Route::get('/history', [EspLockerController::class, 'history']);
-Route::get('/dataPeminjaman', [historyController::class, 'index']);
+Route::get('/dataPeminjaman', [HistoryController::class, 'index']);
 
-Route::get('/lockers', [lockerController::class, 'index']);
+Route::get('/lockers', [LockerController::class, 'index']);
 
-Route::post('/login', [flutterAuthController::class, 'login']);
+Route::post('/login', [FlutterAuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [flutterAuthController::class, 'logout']);
+    Route::post('/logout', [FlutterAuthController::class, 'logout']);
 
     // Locker
-    Route::get('/lockers/summary', [lockerController::class, 'summary']);
+    Route::get('/lockers/summary', [LockerController::class, 'summary']);
 
     // History
 
 
     // Dashboard
-    Route::get('/dashboard/stats', [flutterDashboardController::class, 'stats']);
+    Route::get('/dashboard/stats', [FlutterDashboardController::class, 'stats']);
 
     // Notifikasi
-    Route::get('/notifications', [notificationController::class, 'index']);
-    Route::put('/notifications/{id}/read', [notificationController::class, 'markRead']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::put('/notifications/{id}/read', [NotificationController::class, 'markRead']);
 
     // Mahasiswa & Staff
-    Route::get('/mahasiswa', [mahasiswaController::class, 'index']);
-    Route::post('/mahasiswa', [mahasiswaController::class, 'store']);
-    Route::get('/staff', [staffController::class, 'index']);
-    Route::post('/staff', [staffController::class, 'store']);
+    Route::get('/mahasiswa', [MahasiswaController::class, 'index']);
+    Route::post('/mahasiswa', [MahasiswaController::class, 'store']);
+    Route::get('/staff', [StaffController::class, 'index']);
+    Route::post('/staff', [StaffController::class, 'store']);
 
-    Route::put('/mahasiswa/{id}', [mahasiswaController::class, 'update']);
-    Route::delete('/mahasiswa/{id}', [mahasiswaController::class, 'destroy']);
-    Route::put('/staff/{id}', [staffController::class, 'update']);
-    Route::delete('/staff/{id}', [staffController::class, 'destroy']);
+    Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'update']);
+    Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
+    Route::put('/staff/{id}', [StaffController::class, 'update']);
+    Route::delete('/staff/{id}', [StaffController::class, 'destroy']);
 
     // Profile
-    Route::post('/profile', [profileController::class, 'update']);
-    Route::delete('/profile', [profileController::class, 'destroy']);
+    Route::post('/profile', [ProfileController::class, 'update']);
+    Route::delete('/profile', [ProfileController::class, 'destroy']);
 });

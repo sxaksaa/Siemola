@@ -1,59 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Siemola
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Siemola is a smart locker monitoring system built for campus item borrowing. It combines a Laravel dashboard, staff/admin workflows, RFID identity checks, and an ESP-based locker API so locker activity can be tracked from the physical device into the web interface.
 
-## About Laravel
+This repository is presented as a project showcase only.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Showcase
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Smart Locker Dashboard
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Siemola provides a monitoring-focused dashboard for checking locker availability, active borrowing activity, late returns, student totals, staff totals, and the latest ESP synchronization state. The interface is designed for operators who need a quick operational view rather than a marketing page.
 
-## Learning Laravel
+### RFID and ESP Flow
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+The locker flow separates access authorization from the actual borrowing record:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. A student taps an RFID card.
+2. The ESP sends the card UID and device ID to the Laravel API.
+3. Siemola validates the card, student status, locker device, and active borrowing state.
+4. Borrowing is recorded when the switch reports that the item was taken.
+5. Return is recorded when the switch reports that the item was placed back.
 
-## Laravel Sponsors
+This keeps an abandoned tap from being treated as a completed borrowing event.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Role-Based Operations
 
-### Premium Partners
+The web dashboard supports separated admin and staff responsibilities:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- Admin users manage staff accounts, student records, and locker records.
+- Staff users review borrowing history and export filtered reports.
+- Public dashboard access can show a student-friendly monitoring view.
 
-## Contributing
+### Locker Model
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The current demo setup keeps the real hardware structure visible:
 
-## Code of Conduct
+- `L1` represents the real ESP locker.
+- `L2` to `L12` are dummy locker entries for dashboard and demo coverage.
+- Locker states are kept operationally simple: available, borrowed, or late.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### History and Reporting
 
-## Security Vulnerabilities
+Borrowing history includes searchable and filterable records by date range, student data, study program, locker, and RFID UID. The export view follows the same filter state so reports match the operator's current screen.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### ESP Simulator
+
+The repository includes a simulator script for demonstrating the ESP API contract without flashing hardware during every test run.
+
+```bash
+php tools\simulate-esp.php check
+php tools\simulate-esp.php tap
+php tools\simulate-esp.php borrow
+php tools\simulate-esp.php return
+php tools\simulate-esp.php cycle
+```
+
+## Built With
+
+- Laravel
+- Laravel Breeze authentication
+- Laravel Sanctum API authentication
+- Blade
+- Tailwind CSS
+- Vite
+- MySQL-compatible database
+- ESP/RFID hardware API integration
+
+## Project Status
+
+Siemola is a private academic/project showcase. The codebase is not published as a reusable package, starter kit, or open-source template.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+All rights reserved.
+
+This source code is proprietary and is provided for showcase and review purposes only. You may not copy, reuse, redistribute, modify, publish, sublicense, or deploy this project or any part of it without explicit written permission from the owner.

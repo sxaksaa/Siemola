@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
-class flutterAuthController extends Controller
+class FlutterAuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {

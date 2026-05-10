@@ -13,6 +13,13 @@ class EspLockerApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['services.esp.token' => 'test-token']);
+    }
+
     public function test_tap_without_taking_item_does_not_create_borrowing_and_can_tap_again(): void
     {
         $setup = $this->createLockerSetup();
@@ -21,7 +28,7 @@ class EspLockerApiTest extends TestCase
             'device_id' => $setup['locker']->device_id,
         ];
 
-        $this->postJson('/api/tab', $payload)
+        $this->postEspJson('/api/tab', $payload)
             ->assertOk()
             ->assertJsonPath('status', 'success')
             ->assertJsonPath('action', 'borrow_authorized');
@@ -29,7 +36,7 @@ class EspLockerApiTest extends TestCase
         $this->assertDatabaseCount('borrowings', 0);
         $this->assertDatabaseCount('locker_accesses', 1);
 
-        $this->postJson('/api/tab', $payload)
+        $this->postEspJson('/api/tab', $payload)
             ->assertOk()
             ->assertJsonPath('status', 'success')
             ->assertJsonPath('action', 'borrow_authorized');
@@ -47,11 +54,11 @@ class EspLockerApiTest extends TestCase
         ];
         $statusPayload = ['device_id' => $setup['locker']->device_id];
 
-        $this->postJson('/api/tab', $tapPayload)
+        $this->postEspJson('/api/tab', $tapPayload)
             ->assertOk()
             ->assertJsonPath('action', 'borrow_authorized');
 
-        $this->postJson('/api/getStatus', $statusPayload + ['locstatus' => 1])
+        $this->postEspJson('/api/getStatus', $statusPayload + ['locstatus' => 1])
             ->assertOk()
             ->assertJsonPath('status', 1)
             ->assertJsonPath('locker_status', 'borrowed')
@@ -63,11 +70,11 @@ class EspLockerApiTest extends TestCase
         $this->assertSame($setup['student']->id, $borrowing->student_id);
         $this->assertNull($borrowing->returned_at);
 
-        $this->postJson('/api/tab', $tapPayload)
+        $this->postEspJson('/api/tab', $tapPayload)
             ->assertOk()
             ->assertJsonPath('action', 'return_authorized');
 
-        $this->postJson('/api/getStatus', $statusPayload + ['locstatus' => 0])
+        $this->postEspJson('/api/getStatus', $statusPayload + ['locstatus' => 0])
             ->assertOk()
             ->assertJsonPath('status', 0)
             ->assertJsonPath('locker_status', 'available')
@@ -85,21 +92,21 @@ class EspLockerApiTest extends TestCase
         $student = Student::query()->create([
             'name' => 'Aksa Mahasiswa',
             'nim' => '2026042901',
-            'rfid_uid' => '37 DB 7E 5',
+            'rfid_uid' => 'AA BB CC DD',
             'study_program' => 'Teknik Informatika',
             'class_name' => 'TI-1A',
             'status' => 'active',
         ]);
 
         $rfidCard = RfidCard::query()->create([
-            'uid' => '37 DB 7E 5',
+            'uid' => 'AA BB CC DD',
             'user_id' => $student->id,
         ]);
 
         $locker = Locker::query()->create([
-            'code' => 'L1',
-            'name' => 'Loker 1',
-            'device_id' => '14:08:08:A6:69:34',
+            'code' => 'T1',
+            'name' => 'Test Locker',
+            'device_id' => 'ESP-TEST-01',
             'status' => 'available',
             'switch_state' => 0,
         ]);
@@ -109,5 +116,12 @@ class EspLockerApiTest extends TestCase
             'rfidCard' => $rfidCard,
             'locker' => $locker,
         ];
+    }
+
+    private function postEspJson(string $uri, array $data = [])
+    {
+        return $this
+            ->withHeader('X-ESP-TOKEN', 'test-token')
+            ->postJson($uri, $data);
     }
 }

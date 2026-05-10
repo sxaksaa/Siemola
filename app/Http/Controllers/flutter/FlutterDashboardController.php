@@ -9,7 +9,7 @@ use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
-class flutterDashboardController extends Controller
+class FlutterDashboardController extends Controller
 {
     // ── GET /api/dashboard/stats ──────────────────────────────────────────────
     public function stats(): JsonResponse
